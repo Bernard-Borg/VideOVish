@@ -1,0 +1,63 @@
+html, body, main {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+}
+
+#top-bar {
+    background-color: #252526;
+    min-height: 30px;
+    -webkit-app-region: drag;
+}
+
+#main-video {
+    background: black;
+    max-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+#video-controls {
+    height: 80px;
+    display: flex;
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    background-image: linear-gradient(transparent, black);
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+video {
+    max-height: 100%;
+    width: 100%;
+}
+
+#video-controls > button {
+    width: 75px;
+    height: 75px;
+    background-color: transparent;
+    outline: none;
+    padding: 20px;
+    border: none;
+}
+
+.svg-container {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+path {
+    fill: #ffffff;
+}
+
+#video-controls > button:focus {
+    outline: 3px solid white;
+}
