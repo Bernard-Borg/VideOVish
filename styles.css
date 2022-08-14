@@ -7,6 +7,13 @@ body {
     overflow: hidden;
 }
 
+#playspeed-indicator {
+    color: white;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    position: fixed;
+    top: 30px;
+}
+
 #top-bar {
     background-color: #252526;
     min-height: 30px;
@@ -54,8 +61,57 @@ video {
     height: 100%;
 }
 
+#progress-bar-container {
+    display: flex;
+    flex-direction: column;
+    width: 95%;
+    bottom: 140px;
+    position: relative;
+    margin: 0 auto;
+}
+
+#progress-bar {
+    background: rgba(255, 255, 255, 0.5);
+    width: 100%;
+    height: 5px;
+}
+
+#progress-bar-circle {
+    border-radius: 100%;
+    width: 16px;
+    height: 16px;
+    background-color: red;
+    position: relative;
+    top: -8px;
+    pointer-events: none;
+}
+
+#progress-color {
+    width: 50%;
+    background-color: red;
+    height: 3px;
+    outline: 2px solid red;
+}
+
+#video-info-container {
+    margin-top: 5px;
+}
+
+#video-info-container > span {
+    color: white;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+#video-current-time {
+    float: left;
+}
+
+#video-duration {
+    float: right;
+}
+
 path {
-    fill: #ffffff;
+    fill: white;
 }
 
 #video-controls > button:focus {
