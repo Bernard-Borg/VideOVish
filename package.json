@@ -1,56 +1,53 @@
 {
-  "name": "video-player-app",
-  "version": "1.0.0",
+  "name": "JS Video Player",
   "description": "A minimalistic video player!",
   "main": "main.js",
+  "author": "Bernard Borg",
+  "license": "GNU GPLv3",
+  "version": "1.1.0",
   "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make"
+    "postinstall": "install-app-deps",
+    "start": "npm install && electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.bernardborg.videoplayerapp",
+    "win": {
+      "target": "nsis",
+      "icon": "VideoPlayerIcon.ico"
+    },
+    "fileAssociations": [
+      {
+        "ext": ".ogg",
+        "name": "Ogg File",
+        "role": "Editor"
+      },
+      {
+        "ext": ".webm",
+        "name": "Webm File",
+        "role": "Editor"
+      },
+      {
+        "ext": ".mp4",
+        "name": "MP4 File",
+        "role": "Editor"
+      }
+    ],
+    "nsis": {
+      "perMachine": true
+    }
   },
   "repository": "https://github.com/Bernard-Borg/VideoPlayerApp",
   "keywords": [
-    "video", "player", "mp4", "ogg"
+    "video",
+    "player",
+    "mp4",
+    "ogg",
+    "webm"
   ],
-  "author": "Bernard Borg",
-  "license": "GNU GPLv3",
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.65",
-    "@electron-forge/maker-deb": "^6.0.0-beta.65",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.65",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.65",
-    "@electron-forge/maker-zip": "^6.0.0-beta.65",
-    "electron": "^19.0.9"
-  },
-  "dependencies": {
-    "electron-squirrel-startup": "^1.0.0",
-    "uuid": "^8.3.2"
-  },
-  "config": {
-    "forge": {
-      "packagerConfig": {},
-      "makers": [
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "soundboard_app"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {}
-        }
-      ]
-    }
+    "electron": "^19.0.9",
+    "electron-builder": "^23.3.3"
   }
 }

@@ -87,7 +87,7 @@ video {
 }
 
 #progress-color {
-    width: 50%;
+    width: 0%;
     background-color: red;
     height: 3px;
     outline: 2px solid red;

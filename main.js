@@ -21,7 +21,8 @@ function createWindow () {
       enableRemoteModule: true,
       preload: path.join(__dirname, 'preload.js')
     },
-    autoHideMenuBar: true
+    autoHideMenuBar: true,
+    icon: path.join(__dirname, 'VideoPlayerIcon.ico')
   })
 
   // and load the index.html of the app.
@@ -32,7 +33,7 @@ function createWindow () {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  createWindow()
+  createWindow();
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -48,22 +49,21 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
 
-// Show open file dialog, only allowing sound files
-// ipcMain.handle("showDialog", (e) => {
-//     return dialog.showOpenDialog(
-//         {
-//             properties: ['openFile'],
-//             filters: [
-//                 { name: 'Audio Files', extensions: ['wav', 'ogg', 'mp3'] }
-//             ]
-//         } 
-//     );
-// });
+// Show open file dialog, only allowing supported video files
+ipcMain.handle("showDialog", (e) => {
+    return dialog.showOpenDialog(
+        {
+            properties: ['openFile'],
+            filters: [
+                { name: 'Supported Video Files', extensions: ['mp4', 'ogg', 'webm'] }
+            ]
+        } 
+    );
+});
 
-// // Show open file dialog, only allowing sound files
-// ipcMain.handle("getConfigPath", (e) => {
-//   return app.getPath("appData");
-// });
+ipcMain.handle("getVideoArgs", (e) => {
+  return process.argv;
+});
   
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

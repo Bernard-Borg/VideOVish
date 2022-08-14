@@ -1,8 +1,8 @@
-const MINIMUM_PLAYBACK_SPEED = 0.10;
-const MAXIMUM_PLAYBACK_SPEED = 16.0;
+const { ipcRenderer } = require('electron');
+const path = require('path');
 
 const NUM_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-const PLAYBACK_SPEEDS = [0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 5, 7.5, 10, 12, 14, 16]
+const PLAYBACK_SPEEDS = [0.07, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 5, 7.5, 10, 12, 14, 16]
 
 let playingVideoInterval = null;
 let playbackIndex = 5;
@@ -13,18 +13,18 @@ function getVideo() {
 
 String.prototype.toHHMMSS = function () {
     let sec_num = parseInt(this, 10);
-    let hours   = Math.floor(sec_num / 3600);
+    let hours = Math.floor(sec_num / 3600);
     let minutes = Math.floor((sec_num - (hours * 3600)) / 60);
     let seconds = sec_num - (hours * 3600) - (minutes * 60);
 
     if (hours < 10) {
         hours = "0" + hours;
     }
-    
+
     if (minutes < 10) {
         minutes = "0" + minutes;
     }
-    
+
     if (seconds < 10) {
         seconds = "0" + seconds;
     }
@@ -60,7 +60,7 @@ function increaseVolume() {
 
 function decreaseVolume() {
     let video = getVideo();
-    
+
     if (video.volume > 0) {
         video.volume = (video.volume - 0.1).toFixed(1);
     }
@@ -68,7 +68,7 @@ function decreaseVolume() {
 
 function forwardVideo(amount) {
     let video = getVideo();
-        
+
     if (video.currentTime <= video.duration - amount) {
         video.currentTime += amount;
     }
@@ -110,7 +110,7 @@ function changePlayrate(direction) {
     let video = getVideo();
 
     if (direction == 1) {
-        if (playbackIndex < PLAYBACK_SPEEDS.length) {
+        if (playbackIndex < PLAYBACK_SPEEDS.length - 1) {
             playbackIndex++;
         }
     } else {
@@ -122,13 +122,53 @@ function changePlayrate(direction) {
     video.playbackRate = PLAYBACK_SPEEDS[playbackIndex];
 }
 
-window.onload = function() {
+function setVideoSource(filepath) {
+    let videoSource = document.getElementById("video-player");
+    videoSource.src = filepath;
+
+    let fileExtension = path.extname(filepath);
+    let type = "";
+
+    if (fileExtension.toLowerCase() == ".ogg") {
+        type = "video/ogg";
+    } else if (fileExtension.toLowerCase() == ".webm") {
+        type = "video/webm";
+    } else if (fileExtension.toLowerCase() == ".mp4") {
+        type = "video/mp4";
+    } else {
+        console.warn("WARNING: file type not supported");
+    }
+
+    videoSource.type = type;
+}
+
+window.onload = async function () {
+    let videoArgs;
+    
+    await ipcRenderer.invoke("getVideoArgs").then((result) => {
+        videoArgs = result;
+    });
+
+    if (videoArgs.length > 1) {
+        setVideoSource(videoArgs[1]);
+    } else {
+        await ipcRenderer.invoke("showDialog").then((result) => {
+            let videoPath = result.filePaths[0];
+
+            if (videoPath !== undefined) {
+                setVideoSource(videoPath);
+            }
+        });
+    }
+
     updatePlaybackText();
     updateVideoInformation();
-    
-    document.getElementById("video-duration").innerText = getVideo().duration.toString().toHHMMSS();
 
-    document.getElementById("progress-bar").addEventListener("click", function(event) {
+    getVideo().onloadedmetadata = function() {
+        document.getElementById("video-duration").innerText = getVideo().duration.toString().toHHMMSS();
+    }
+
+    document.getElementById("progress-bar").addEventListener("click", function (event) {
         let video = getVideo();
 
         video.currentTime = (event.offsetX / document.getElementById("progress-bar").clientWidth) * video.duration;
@@ -136,19 +176,15 @@ window.onload = function() {
         updateVideoInformation();
     });
 
-    window.addEventListener("keydown", function(event) {
+    window.addEventListener("keydown", function (event) {
         let video = getVideo();
 
         if (event.key == "d" || event.key == "D") {
-            if (video.playbackRate < MAXIMUM_PLAYBACK_SPEED) {
-                changePlayrate(1);
-                updatePlaybackText();
-            }
+            changePlayrate(1);
+            updatePlaybackText();
         } else if (event.key == "s" || event.key == "S") {
-            if (video.playbackRate > MINIMUM_PLAYBACK_SPEED) {
-                changePlayrate(0);
-                updatePlaybackText();
-            }
+            changePlayrate(0);
+            updatePlaybackText();
         } else if (event.key == "j" || event.key == "J") {
             rewindVideo(10);
         } else if (event.key == "k" || event.key == "K") {
@@ -167,23 +203,21 @@ window.onload = function() {
         }
     });
 
-    window.addEventListener("keyup", function(event) {
-        let video = getVideo();
-
+    window.addEventListener("keyup", function (event) {
         if (event.key == " ") {
             playVideo();
         }
     });
 
-    document.getElementById("rewind-button").addEventListener("click", function (){
+    document.getElementById("rewind-button").addEventListener("click", function () {
         rewindVideo(5);
     });
 
-    document.getElementById("play-button").addEventListener("click", function (){
+    document.getElementById("play-button").addEventListener("click", function () {
         playVideo();
     });
 
-    document.getElementById("forward-button").addEventListener("click", function() {
+    document.getElementById("forward-button").addEventListener("click", function () {
         forwardVideo(5);
     });
 }
