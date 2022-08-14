@@ -1,5 +1,5 @@
 {
-  "name": "JS Video Player",
+  "name": "video-player-app",
   "description": "A minimalistic video player!",
   "main": "main.js",
   "author": "Bernard Borg",
@@ -49,5 +49,8 @@
   "devDependencies": {
     "electron": "^19.0.9",
     "electron-builder": "^23.3.3"
+  },
+  "dependencies": {
+    "jquery": "^3.6.0"
   }
 }

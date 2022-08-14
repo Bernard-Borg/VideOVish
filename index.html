@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com">
     <link href="./styles.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +13,11 @@
     <main>
       <div id="top-bar"></div>
       <span id="playspeed-indicator"></span>
+      <div id="transformation-alert">
+        <div id="transformation-icon">
+        </div>
+        <span id="transformation-text"></span>
+      </div>
       <div id="main-video">
         <video id="video-player"></video>
       </div>
@@ -57,7 +62,7 @@
         </button>
       </div>
     </main>
-    <script type="module" src="./video-player.js"></script>
+    <script type="module" src="./video-player.js" async defer></script>
     <script src="./renderer.js"></script>
   </body>
 </html>
