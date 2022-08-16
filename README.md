@@ -1,5 +1,5 @@
 # VideoPlayerApp
-A minimalist video player app inspired by Films and TV, but with more features, such as changing video playing speeds.
+A minimalist video player app which supports MP4, OGG and WEBM formats - made with Electron!
 
 ## Features
 
