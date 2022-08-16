@@ -1,7 +1,7 @@
 const { ipcRenderer } = require('electron');
 const path = require('path');
 const fs = require('fs');
-window.$ = require('jquery');
+window.$ = window.jQuery = require('jquery');
 
 const NUM_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 const PLAYBACK_SPEEDS = [0.07, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 5, 7.5, 10, 12, 14, 16]
@@ -10,6 +10,21 @@ const VALID_EXTENSIONS = ['.ogg', '.webm', '.mp4']
 let playingVideoInterval = null;
 let playbackIndex = 5;
 let isFullscreen = false;
+let uiHidden = false;
+let loopMode = false;
+
+(function ($) {
+    var timeout;
+    $(document).on('mousemove', function (event) {
+        if (timeout !== undefined) {
+            window.clearTimeout(timeout);
+        }
+        timeout = window.setTimeout(function () {
+            // trigger the new event on event.target, so that it can bubble appropriately
+            $(event.target).trigger('mousemoveend');
+        }, 1000);
+    });
+}(jQuery));
 
 function getVideo() {
     let video = document.getElementById("video-player");
@@ -217,6 +232,24 @@ function changePlayrate(direction) {
     video.playbackRate = PLAYBACK_SPEEDS[playbackIndex];
 }
 
+function loopBack() {
+    let videoPlayer = document.getElementById("video-player");
+    videoPlayer.currentTime = 0;
+    videoPlayer.play();
+}
+
+function setLoopMode() {
+    if (loopMode) {
+        document.querySelector("#loop-button > .svg-container > svg > path").style.fill = "white";
+        document.getElementById("video-player").removeEventListener("ended", loopBack);
+    } else {
+        document.querySelector("#loop-button > .svg-container > svg > path").style.fill = "limegreen";
+        document.getElementById("video-player").addEventListener("ended", loopBack);
+    }
+
+    loopMode = !loopMode;
+}
+
 function setVideoSource(filepath) {
     let videoSource = document.getElementById("video-player");
     videoSource.src = filepath;
@@ -249,6 +282,24 @@ async function showVideoDialog() {
 
 async function showHelpModal() {
     await ipcRenderer.invoke("showHelpModal");
+}
+
+function showUI() {
+    let videoControls = document.getElementById("video-controls");
+    videoControls.style.display = "flex";
+    videoControls.style.background = "linear-gradient(transparent, black)";
+
+    let progressBar = document.getElementById("progress-bar-container");
+    progressBar.style.display = "flex";
+}
+
+function hideUI() {
+    let videoControls = document.getElementById("video-controls");
+    videoControls.style.display = "none";
+    videoControls.style.background = "transparent";
+
+    let progressBar = document.getElementById("progress-bar-container");
+    progressBar.style.display = "none";
 }
 
 window.onload = async function () {
@@ -317,6 +368,18 @@ window.onload = async function () {
         }
     });
 
+    $(window).on('mousemoveend', function() {
+        hideUI();
+        uiHidden = true;
+    });
+
+    window.addEventListener("mousemove", function() {
+        if (uiHidden) {
+            showUI();
+            uiHidden = false;
+        }
+    });
+
     document.getElementById("rewind-button").addEventListener("click", function () {
         rewindVideo(5);
     });
@@ -335,5 +398,9 @@ window.onload = async function () {
 
     document.getElementById("help-button").addEventListener("click", function () {
         showHelpModal();
+    });
+
+    document.getElementById("loop-button").addEventListener("click", function () {
+        setLoopMode();
     });
 }

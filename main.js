@@ -27,7 +27,7 @@ function createWindow () {
   })
 
   // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
+  mainWindow.loadFile('mainWindow/index.html')
 
   mainWindow.on('closed', function() {
     app.quit();
@@ -96,7 +96,7 @@ ipcMain.handle("showHelpModal", (e) => {
     icon: path.join(__dirname, 'VideoPlayerIcon.ico')
   })
 
-  helpWindow.loadFile('help.html')
+  helpWindow.loadFile('helpWindow/help.html')
 
   helpWindow.on("blur", () => {
     helpWindow.destroy();
