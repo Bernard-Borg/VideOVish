@@ -1,5 +1,5 @@
 # VideoPlayerApp
-A minimalist video player app which supports MP4, OGG and WEBM formats - made with Electron!
+A minimalist video player app which supports MP4, OGG and WEBM, MKV and MOV formats (can also play MP3 audio files) - made with Electron!
 
 ## Features
 
