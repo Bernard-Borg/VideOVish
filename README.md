@@ -14,4 +14,4 @@ The feature set and interface of the video player was inspired by both Windows' 
 
 ## App screenshot
 
-![image](https://user-images.githubusercontent.com/35971384/184992402-b437a2e3-7a6b-4c9e-8c46-8ea877cf9632.png)
+![image](https://user-images.githubusercontent.com/35971384/184998862-49ff3528-0dc0-456e-8791-338424db9655.png)
