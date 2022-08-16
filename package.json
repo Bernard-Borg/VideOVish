@@ -51,7 +51,6 @@
     "electron-builder": "^23.3.3"
   },
   "dependencies": {
-    "jquery": "^3.6.0",
-    "mediaelement": "^5.0.5"
+    "jquery": "^3.6.0"
   }
 }
