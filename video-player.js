@@ -9,12 +9,13 @@ const VALID_EXTENSIONS = ['.ogg', '.webm', '.mp4']
 
 let playingVideoInterval = null;
 let playbackIndex = 5;
+let isFullscreen = false;
 
 function getVideo() {
     let video = document.getElementById("video-player");
 
     if (video.src == '') {
-        alert("Restart the application to specify a video to play.");
+        alert("Press Ctrl+O to select a video to play.");
     }
     
     return video;
@@ -58,7 +59,6 @@ function displayTransformationAlert(icon, text) {
     transformationAlert.style.opacity = "1";
     transformationAlert.style.visibility = "visible";
     transformationAlert.style.display = "flex";
-
 
     transformationTimeout = setTimeout(fadeTransformationAlert, 750);
 }
@@ -169,6 +169,20 @@ function seekVideoSection(videoSection) {
     video.currentTime = videoSection * video.duration;
 }
 
+async function setFullscreen(isF11) {
+    if (!isF11) {
+        await ipcRenderer.invoke("setFullscreen", isFullscreen);
+    }
+
+    if (isFullscreen) {
+        document.getElementById("top-bar").style.display = "none";
+    } else {
+        document.getElementById("top-bar").style.display = "";
+    }
+
+    isFullscreen = !isFullscreen;
+}
+
 function playVideo() {
     let video = getVideo();
 
@@ -223,6 +237,20 @@ function setVideoSource(filepath) {
     videoSource.type = type;
 }
 
+async function showVideoDialog() {
+    await ipcRenderer.invoke("showDialog").then((result) => {
+        let videoPath = result.filePaths[0];
+
+        if (videoPath !== undefined) {
+            setVideoSource(videoPath);
+        }
+    });
+}
+
+async function showHelpModal() {
+    await ipcRenderer.invoke("showHelpModal");
+}
+
 window.onload = async function () {
     let videoArgs;
     
@@ -233,13 +261,7 @@ window.onload = async function () {
     if (videoArgs.length > 1 && fs.existsSync(videoArgs[1]) && VALID_EXTENSIONS.includes(path.extname(videoArgs[1]).toLowerCase())) {
         setVideoSource(videoArgs[1]);
     } else {
-        await ipcRenderer.invoke("showDialog").then((result) => {
-            let videoPath = result.filePaths[0];
-
-            if (videoPath !== undefined) {
-                setVideoSource(videoPath);
-            }
-        });
+        await showVideoDialog();
     }
 
     let video = getVideo();
@@ -257,16 +279,20 @@ window.onload = async function () {
     });
 
     window.addEventListener("keydown", function (event) {
-        if (event.key == "d" || event.key == "D") {
+        if (event.key.toLowerCase() == "d") {
             changePlayrate(1);
             updatePlaybackText();
-        } else if (event.key == "s" || event.key == "S") {
+        } else if (event.key.toLowerCase() == "s") {
             changePlayrate(0);
             updatePlaybackText();
-        } else if (event.key == "j" || event.key == "J") {
+        } else if (event.key.toLowerCase() == "j") {
             rewindVideo(10);
-        } else if (event.key == "k" || event.key == "K") {
+        } else if (event.key.toLowerCase() == "k") {
             forwardVideo(10);
+        } else if (event.key == "F1") {
+            showHelpModal();
+        } else if (event.key == "F11") {
+            setFullscreen(true);
         } else if (event.key == "ArrowLeft") {
             rewindVideo(5);
         } else if (event.key == "ArrowRight") {
@@ -284,6 +310,10 @@ window.onload = async function () {
     window.addEventListener("keyup", function (event) {
         if (event.key == " ") {
             playVideo();
+        } else if (event.key.toLowerCase() == "o" && event.ctrlKey) {
+            showVideoDialog();
+        } else if (event.key == "/" && event.ctrlKey) {
+            showHelpModal();
         }
     });
 
@@ -297,5 +327,13 @@ window.onload = async function () {
 
     document.getElementById("forward-button").addEventListener("click", function () {
         forwardVideo(5);
+    });
+
+    document.getElementById("maximise-button").addEventListener("click", function () {
+        setFullscreen();
+    });
+
+    document.getElementById("help-button").addEventListener("click", function () {
+        showHelpModal();
     });
 }

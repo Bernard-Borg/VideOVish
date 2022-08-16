@@ -7,7 +7,7 @@
   "version": "1.1.0",
   "scripts": {
     "postinstall": "install-app-deps",
-    "start": "npm install && electron .",
+    "start": "electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
   },
@@ -19,17 +19,17 @@
     },
     "fileAssociations": [
       {
-        "ext": ".ogg",
+        "ext": "ogg",
         "name": "Ogg File",
         "role": "Editor"
       },
       {
-        "ext": ".webm",
+        "ext": "webm",
         "name": "Webm File",
         "role": "Editor"
       },
       {
-        "ext": ".mp4",
+        "ext": "mp4",
         "name": "MP4 File",
         "role": "Editor"
       }
