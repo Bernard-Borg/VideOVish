@@ -5,7 +5,7 @@ window.$ = window.jQuery = require('jquery');
 
 const NUM_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 const PLAYBACK_SPEEDS = [0.07, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 5, 7.5, 10, 12, 14, 16]
-const VALID_EXTENSIONS = ['.ogg', '.webm', '.mp4']
+const VALID_EXTENSIONS = ['ogg', 'webm', 'mp4', 'mkv', 'mov', 'mp3']
 
 let playingVideoInterval = null;
 let playbackIndex = 5;
@@ -58,7 +58,6 @@ String.prototype.toHHMMSS = function () {
 
 let transformationTimeout = undefined;
 
-// jQuery was added solely for this transformation - maybe find a way to do it without jQuery, so that it saves on app size
 function fadeTransformationAlert() {
     $("#transformation-alert").fadeOut();
 }
@@ -271,7 +270,7 @@ function setVideoSource(filepath) {
 }
 
 async function showVideoDialog() {
-    await ipcRenderer.invoke("showDialog").then((result) => {
+    await ipcRenderer.invoke("showDialog", VALID_EXTENSIONS).then((result) => {
         let videoPath = result.filePaths[0];
 
         if (videoPath !== undefined) {

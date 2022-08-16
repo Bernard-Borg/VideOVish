@@ -47,12 +47,12 @@ app.on('window-all-closed', function () {
 })
 
 // Show open file dialog, only allowing supported video files
-ipcMain.handle("showDialog", (e) => {
+ipcMain.handle("showDialog", (e, supportedExtensions) => {
     return dialog.showOpenDialog(
         {
             properties: ['openFile'],
             filters: [
-                { name: 'Supported Video Files', extensions: ['mp4', 'ogg', 'webm'] }
+                { name: 'Supported Video Files', extensions: supportedExtensions }
             ]
         } 
     );
