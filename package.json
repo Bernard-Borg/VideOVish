@@ -4,7 +4,7 @@
   "main": "main.js",
   "author": "Bernard Borg",
   "license": "GNU GPLv3",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "scripts": {
     "postinstall": "install-app-deps",
     "start": "electron .",
@@ -20,7 +20,14 @@
     "artifactName": "${productName} Setup ${version}.exe",
     "fileAssociations": [
       {
-        "ext": ["ogg", "webm", "mp4", "mov", "mkv", "mp3"],
+        "ext": [
+          "ogg",
+          "webm",
+          "mp4",
+          "mov",
+          "mkv",
+          "mp3"
+        ],
         "name": "Video File",
         "role": "Editor",
         "icon": "VideoPlayerIcon.ico"
