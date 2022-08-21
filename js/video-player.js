@@ -30,7 +30,7 @@ function getVideo() {
     let video = document.getElementById("video-player");
 
     if (video.src == '') {
-        alert("Press Ctrl+O to select a video to play.");
+        alert("Press Ctrl+O to select a video to play");
     }
     
     return video;
@@ -67,7 +67,6 @@ function displayTransformationAlert(icon, text) {
 
     document.getElementById("transformation-icon").innerHTML = icon;
     document.getElementById("transformation-text").innerText = text;
-    console.log(document.getElementById("transformation-alert"));
 
     let transformationAlert = document.getElementById("transformation-alert");
     transformationAlert.style.opacity = "1";
@@ -250,8 +249,8 @@ function setLoopMode() {
 }
 
 function setVideoSource(filepath) {
-    let videoSource = document.getElementById("video-player");
-    videoSource.src = filepath;
+    let video = document.getElementById("video-player");
+    video.src = filepath;
 
     let fileExtension = path.extname(filepath);
     let type = "";
@@ -266,7 +265,8 @@ function setVideoSource(filepath) {
         console.warn("WARNING: file type not supported");
     }
 
-    videoSource.type = type;
+    video.type = type;
+    playVideo();
 }
 
 async function showVideoDialog() {
@@ -320,7 +320,7 @@ window.onload = async function () {
     updateVideoInformation(video);
 
     video.onloadedmetadata = function() {
-        document.getElementById("video-duration").innerText = getVideo().duration.toString().toHHMMSS();
+        document.getElementById("video-duration").innerText = video.duration.toString().toHHMMSS();
     }
 
     document.getElementById("progress-bar").addEventListener("click", function (event) {
