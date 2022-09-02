@@ -71,6 +71,10 @@ ipcMain.handle("changeVideoYoutube", (e, videoPath, videoTitle) => {
     youtubeSelectorWindow.destroy();
 });
 
+ipcMain.handle("getAppDataDirectory", () => {
+    return app.getPath('userData');
+});
+
 ipcMain.handle("showHelpModal", (e) => {
     const helpWindow = new BrowserWindow({
         width: 1024,

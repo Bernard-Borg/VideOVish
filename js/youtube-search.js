@@ -4,7 +4,6 @@ const path = require('path');
 
 const { v4: uuidv4 } = require('uuid');
 const { ipcRenderer } = require("electron");
-const videoDirectory = "./youtube-downloads";
 
 function animateLoadingText() {
     let loadingText = document.getElementById("loading-text");
@@ -22,11 +21,24 @@ function animateLoadingText() {
 
 let wasSearchSuccessful = false;
 
-window.onload = function () {
+window.onload = async function () {
+    let videoDirectory;
+
+    await ipcRenderer.invoke("getAppDataDirectory").then(value => {
+        videoDirectory = path.join(value, "youtube-downloads");
+
+        if (!fs.existsSync(videoDirectory)) {
+            fs.mkdirSync(videoDirectory);
+        }
+    });
+
+    console.log(videoDirectory);
+
     document.getElementById("youtube-search").addEventListener("keyup", async function (event) {
         document.getElementById("youtube-search").style.outline = "none";
 
         if(event.key == "Enter") {
+            //Prevents user from clicking enter multiple times
             if (wasSearchSuccessful) {
                 return;
             }
@@ -36,9 +48,10 @@ window.onload = function () {
                 if (err) throw err;
     
                 for (const file of files) {
-                    fs.unlink(path.join(videoDirectory, file), err => {
-                        if (err) throw err;
-                    });
+                    console.log(file);
+                    // fs.unlink(path.join(videoDirectory, file), err => {
+                    //     if (err) throw err;
+                    // });
                 }
             });
 

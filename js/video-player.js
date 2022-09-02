@@ -29,10 +29,10 @@ let loopMode = false;
     });
 })(jQuery);
 
-function getVideo() {
+function getVideo(ignoreSrc = false) {
     let video = document.getElementById("video-player");
 
-    if (video.src == "") {
+    if (!ignoreSrc && video.src == "") {
         alert("Press Ctrl+O to select a video to play");
     }
 
@@ -314,7 +314,7 @@ async function showVideoDialog() {
 }
 
 async function showHelpModal() {
-    let video = getVideo();
+    let video = getVideo(true);
 
     if (!video.paused) {
         playVideo();
@@ -324,7 +324,7 @@ async function showHelpModal() {
 }
 
 async function showYoutubeModal() {
-    let video = getVideo();
+    let video = getVideo(true);
 
     if (!video.paused) {
         playVideo();
@@ -358,7 +358,7 @@ window.onload = async function () {
         const [videoPath, ...rest] = data.split("*");
         const videoTitle = rest.join("*");
 
-        setVideoSource(path.join(__dirname, '..', videoPath), videoTitle);
+        setVideoSource(videoPath, videoTitle);
     });
 
     await ipcRenderer.invoke("getVideoArgs").then((result) => {
