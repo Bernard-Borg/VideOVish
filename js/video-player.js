@@ -1,11 +1,14 @@
-const { ipcRenderer } = require('electron');
-const path = require('path');
-const fs = require('fs');
-window.$ = window.jQuery = require('jquery');
+const { ipcRenderer } = require("electron");
+const path = require("path");
+const fs = require("fs");
+window.$ = window.jQuery = require("jquery");
 
-const NUM_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-const PLAYBACK_SPEEDS = [0.07, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 5, 7.5, 10, 12, 14, 16]
-const VALID_EXTENSIONS = ['ogg', 'webm', 'mp4', 'mkv', 'mov', 'mp3']
+const NUM_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+const PLAYBACK_SPEEDS = [
+    0.07, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 5, 7.5, 10, 12,
+    14, 16,
+];
+const VALID_EXTENSIONS = ["ogg", "webm", "mp4", "mkv", "mov", "mp3"];
 
 let playingVideoInterval = null;
 let playbackIndex = 5;
@@ -15,32 +18,32 @@ let loopMode = false;
 
 (function ($) {
     var timeout;
-    $(document).on('mousemove', function (event) {
+    $(document).on("mousemove", function (event) {
         if (timeout !== undefined) {
             window.clearTimeout(timeout);
         }
         timeout = window.setTimeout(function () {
             // trigger the new event on event.target, so that it can bubble appropriately
-            $(event.target).trigger('mousemoveend');
+            $(event.target).trigger("mousemoveend");
         }, 1000);
     });
-}(jQuery));
+})(jQuery);
 
 function getVideo() {
     let video = document.getElementById("video-player");
 
-    if (video.src == '') {
+    if (video.src == "") {
         alert("Press Ctrl+O to select a video to play");
     }
-    
+
     return video;
 }
 
 String.prototype.toHHMMSS = function () {
     let sec_num = parseInt(this, 10);
     let hours = Math.floor(sec_num / 3600);
-    let minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-    let seconds = sec_num - (hours * 3600) - (minutes * 60);
+    let minutes = Math.floor((sec_num - hours * 3600) / 60);
+    let seconds = sec_num - hours * 3600 - minutes * 60;
 
     if (hours < 10) {
         hours = "0" + hours;
@@ -53,8 +56,8 @@ String.prototype.toHHMMSS = function () {
     if (seconds < 10) {
         seconds = "0" + seconds;
     }
-    return hours + ':' + minutes + ':' + seconds;
-}
+    return hours + ":" + minutes + ":" + seconds;
+};
 
 let transformationTimeout = undefined;
 
@@ -94,20 +97,25 @@ function updateVideoInformation(video = null) {
     }
 
     document.getElementById("video-current-time").innerText = time;
-    document.getElementById("progress-bar-circle").style.marginLeft = `${theVideo.currentTime / theVideo.duration * 100}%`;
-    document.getElementById("progress-color").style.width = `${theVideo.currentTime / theVideo.duration * 100}%`;
+    document.getElementById("progress-bar-circle").style.marginLeft = `${
+        (theVideo.currentTime / theVideo.duration) * 100
+    }%`;
+    document.getElementById("progress-color").style.width = `${
+        (theVideo.currentTime / theVideo.duration) * 100
+    }%`;
 }
 
 function updatePlaybackText(video = null) {
     let theVideo;
-    
+
     if (video != null) {
         theVideo = video;
     } else {
         theVideo = getVideo();
     }
 
-    document.getElementById("playspeed-indicator").innerText = theVideo.playbackRate.toFixed(2);
+    document.getElementById("playspeed-indicator").innerText =
+        theVideo.playbackRate.toFixed(2);
 }
 
 function getVolumeIcon(volume) {
@@ -131,7 +139,10 @@ function increaseVolume() {
         video.volume = (video.volume + 0.1).toFixed(1);
     }
 
-    displayTransformationAlert(getVolumeIcon(video.volume), `${video.volume.toFixed(1) * 100}%`);
+    displayTransformationAlert(
+        getVolumeIcon(video.volume),
+        `${video.volume.toFixed(1) * 100}%`
+    );
 }
 
 function decreaseVolume() {
@@ -141,7 +152,10 @@ function decreaseVolume() {
         video.volume = (video.volume - 0.1).toFixed(1);
     }
 
-    displayTransformationAlert(getVolumeIcon(video.volume), `${video.volume.toFixed(1) * 100}%`);
+    displayTransformationAlert(
+        getVolumeIcon(video.volume),
+        `${video.volume.toFixed(1) * 100}%`
+    );
 }
 
 function forwardVideo(amount) {
@@ -152,7 +166,7 @@ function forwardVideo(amount) {
     }
 
     displayTransformationAlert(
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M496 48V192c0 17.69-14.31 32-32 32H320c-17.69 0-32-14.31-32-32s14.31-32 32-32h63.39c-29.97-39.7-77.25-63.78-127.6-63.78C167.7 96.22 96 167.9 96 256s71.69 159.8 159.8 159.8c34.88 0 68.03-11.03 95.88-31.94c14.22-10.53 34.22-7.75 44.81 6.375c10.59 14.16 7.75 34.22-6.375 44.81c-39.03 29.28-85.36 44.86-134.2 44.86C132.5 479.9 32 379.4 32 256s100.5-223.9 223.9-223.9c69.15 0 134 32.47 176.1 86.12V48c0-17.69 14.31-32 32-32S496 30.31 496 48z"/></svg>`, 
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M496 48V192c0 17.69-14.31 32-32 32H320c-17.69 0-32-14.31-32-32s14.31-32 32-32h63.39c-29.97-39.7-77.25-63.78-127.6-63.78C167.7 96.22 96 167.9 96 256s71.69 159.8 159.8 159.8c34.88 0 68.03-11.03 95.88-31.94c14.22-10.53 34.22-7.75 44.81 6.375c10.59 14.16 7.75 34.22-6.375 44.81c-39.03 29.28-85.36 44.86-134.2 44.86C132.5 479.9 32 379.4 32 256s100.5-223.9 223.9-223.9c69.15 0 134 32.47 176.1 86.12V48c0-17.69 14.31-32 32-32S496 30.31 496 48z"/></svg>`,
         `${amount}s`
     );
 
@@ -169,7 +183,7 @@ function rewindVideo(amount) {
     }
 
     displayTransformationAlert(
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M480 256c0 123.4-100.5 223.9-223.9 223.9c-48.86 0-95.19-15.58-134.2-44.86c-14.14-10.59-17-30.66-6.391-44.81c10.61-14.09 30.69-16.97 44.8-6.375c27.84 20.91 61 31.94 95.89 31.94C344.3 415.8 416 344.1 416 256s-71.67-159.8-159.8-159.8C205.9 96.22 158.6 120.3 128.6 160H192c17.67 0 32 14.31 32 32S209.7 224 192 224H48c-17.67 0-32-14.31-32-32V48c0-17.69 14.33-32 32-32s32 14.31 32 32v70.23C122.1 64.58 186.1 32.11 256.1 32.11C379.5 32.11 480 132.6 480 256z"/></svg>`, 
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M480 256c0 123.4-100.5 223.9-223.9 223.9c-48.86 0-95.19-15.58-134.2-44.86c-14.14-10.59-17-30.66-6.391-44.81c10.61-14.09 30.69-16.97 44.8-6.375c27.84 20.91 61 31.94 95.89 31.94C344.3 415.8 416 344.1 416 256s-71.67-159.8-159.8-159.8C205.9 96.22 158.6 120.3 128.6 160H192c17.67 0 32 14.31 32 32S209.7 224 192 224H48c-17.67 0-32-14.31-32-32V48c0-17.69 14.33-32 32-32s32 14.31 32 32v70.23C122.1 64.58 186.1 32.11 256.1 32.11C379.5 32.11 480 132.6 480 256z"/></svg>`,
         `${amount}s`
     );
 
@@ -205,7 +219,10 @@ function playVideo() {
         document.getElementById("pause-icon").style.display = "block";
 
         let intervalDuration = video.playbackRate * 1000;
-        playingVideoInterval = setInterval(updateVideoInformation, intervalDuration);
+        playingVideoInterval = setInterval(
+            updateVideoInformation,
+            intervalDuration
+        );
     } else {
         video.pause();
         document.getElementById("play-icon").style.display = "block";
@@ -238,17 +255,34 @@ function loopBack() {
 
 function setLoopMode() {
     if (loopMode) {
-        document.querySelector("#loop-button > .svg-container > svg > path").style.fill = "white";
-        document.getElementById("video-player").removeEventListener("ended", loopBack);
+        document.querySelector(
+            "#loop-button > .svg-container > svg > path"
+        ).style.fill = "white";
+        document
+            .getElementById("video-player")
+            .removeEventListener("ended", loopBack);
     } else {
-        document.querySelector("#loop-button > .svg-container > svg > path").style.fill = "limegreen";
-        document.getElementById("video-player").addEventListener("ended", loopBack);
+        document.querySelector(
+            "#loop-button > .svg-container > svg > path"
+        ).style.fill = "limegreen";
+        document
+            .getElementById("video-player")
+            .addEventListener("ended", loopBack);
     }
 
     loopMode = !loopMode;
 }
 
-function setVideoSource(filepath) {
+function setTitle(title) {
+    document.getElementById("video-title").innerText = title;
+}
+
+function setVideoSource(filepath, title = undefined) {
+    if (title == undefined) {
+        title = path.parse(filepath).name;
+    }
+
+    setTitle(title);
     let video = document.getElementById("video-player");
     video.src = filepath;
 
@@ -280,7 +314,23 @@ async function showVideoDialog() {
 }
 
 async function showHelpModal() {
+    let video = getVideo();
+
+    if (!video.paused) {
+        playVideo();
+    }
+    
     await ipcRenderer.invoke("showHelpModal");
+}
+
+async function showYoutubeModal() {
+    let video = getVideo();
+
+    if (!video.paused) {
+        playVideo();
+    }
+
+    await ipcRenderer.invoke("showYoutubeModal");
 }
 
 function showUI() {
@@ -303,12 +353,23 @@ function hideUI() {
 
 window.onload = async function () {
     let videoArgs;
-    
+
+    ipcRenderer.on("youtube-video-path", function(event, data) {
+        const [videoPath, ...rest] = data.split("*");
+        const videoTitle = rest.join("*");
+
+        setVideoSource(path.join(__dirname, '..', videoPath), videoTitle);
+    });
+
     await ipcRenderer.invoke("getVideoArgs").then((result) => {
         videoArgs = result;
     });
 
-    if (videoArgs.length > 1 && fs.existsSync(videoArgs[1]) && VALID_EXTENSIONS.includes(path.extname(videoArgs[1]).toLowerCase())) {
+    if (
+        videoArgs.length > 1 &&
+        fs.existsSync(videoArgs[1]) &&
+        VALID_EXTENSIONS.includes(path.extname(videoArgs[1]).toLowerCase())
+    ) {
         setVideoSource(videoArgs[1]);
     } else {
         await showVideoDialog();
@@ -319,14 +380,21 @@ window.onload = async function () {
     updatePlaybackText(video);
     updateVideoInformation(video);
 
-    video.onloadedmetadata = function() {
-        document.getElementById("video-duration").innerText = video.duration.toString().toHHMMSS();
-    }
+    video.onloadedmetadata = function () {
+        document.getElementById("video-duration").innerText = video.duration
+            .toString()
+            .toHHMMSS();
+    };
 
-    document.getElementById("progress-bar").addEventListener("click", function (event) {
-        seekVideoSection(event.offsetX / document.getElementById("progress-bar").clientWidth);
-        updateVideoInformation();
-    });
+    document
+        .getElementById("progress-bar")
+        .addEventListener("click", function (event) {
+            seekVideoSection(
+                event.offsetX /
+                    document.getElementById("progress-bar").clientWidth
+            );
+            updateVideoInformation();
+        });
 
     window.addEventListener("keydown", function (event) {
         if (event.key.toLowerCase() == "d") {
@@ -367,39 +435,60 @@ window.onload = async function () {
         }
     });
 
-    $(window).on('mousemoveend', function() {
+    $(window).on("mousemoveend", function () {
         hideUI();
         uiHidden = true;
     });
 
-    window.addEventListener("mousemove", function() {
+    window.addEventListener("mousemove", function () {
         if (uiHidden) {
             showUI();
             uiHidden = false;
         }
     });
 
-    document.getElementById("rewind-button").addEventListener("click", function () {
-        rewindVideo(5);
-    });
+    document
+        .getElementById("rewind-button")
+        .addEventListener("click", function () {
+            rewindVideo(5);
+        });
 
-    document.getElementById("play-button").addEventListener("click", function () {
-        playVideo();
-    });
+    document
+        .getElementById("play-button")
+        .addEventListener("click", function () {
+            playVideo();
+        });
 
-    document.getElementById("forward-button").addEventListener("click", function () {
-        forwardVideo(5);
-    });
+    document
+        .getElementById("forward-button")
+        .addEventListener("click", function () {
+            forwardVideo(5);
+        });
 
-    document.getElementById("maximise-button").addEventListener("click", function () {
-        setFullscreen();
-    });
+    document
+        .getElementById("maximise-button")
+        .addEventListener("click", function () {
+            setFullscreen();
+        });
 
-    document.getElementById("help-button").addEventListener("click", function () {
-        showHelpModal();
-    });
+    document
+        .getElementById("help-button")
+        .addEventListener("click", function () {
+            showHelpModal();
+        });
 
-    document.getElementById("loop-button").addEventListener("click", function () {
-        setLoopMode();
-    });
-}
+    document
+        .getElementById("loop-button")
+        .addEventListener("click", function () {
+            setLoopMode();
+        });
+
+    document
+        .getElementById("youtube-button")
+        .addEventListener("click", function (e) {
+            showYoutubeModal();
+            
+            //The following is to prevent the modal from being opened again when pressing space after it has been closed
+            document.getElementById("youtube-button").blur();
+        });
+};

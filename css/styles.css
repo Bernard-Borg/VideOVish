@@ -1,4 +1,6 @@
-html, body, main {
+html,
+body,
+main {
     height: 100%;
 }
 
@@ -7,7 +9,9 @@ body {
     overflow: hidden;
 }
 
-#playspeed-indicator, #transformation-text, #video-info-container > span {
+#playspeed-indicator,
+#transformation-text,
+#video-info-container>span {
     color: white;
     font-family: 'Inter', 'Segoe UI', sans-serif;
 }
@@ -44,6 +48,11 @@ body {
 #drag-bar {
     -webkit-app-region: drag;
     width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
 #main-video {
@@ -72,7 +81,8 @@ video {
     width: 100%;
 }
 
-#video-controls > button, #top-bar > button {
+#video-controls>button,
+#top-bar>button {
     width: 75px;
     height: 75px;
     background-color: transparent;
@@ -81,7 +91,7 @@ video {
     border: none;
 }
 
-#top-bar > button {
+#top-bar>button {
     width: 30px;
     height: 30px;
     padding: 5px;
@@ -151,6 +161,10 @@ path {
     fill: white;
 }
 
-#video-controls > button:focus {
+#youtube-button path {
+    fill: red;
+}
+
+#video-controls>button:focus {
     outline: 3px solid white;
 }
