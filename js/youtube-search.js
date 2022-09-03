@@ -1,4 +1,4 @@
-const youtubedl = require("youtube-dl-exec");
+const { create: createYoutubeDl } = require("youtube-dl-exec");
 const fs = require('fs');
 const path = require('path');
 
@@ -22,6 +22,20 @@ function animateLoadingText() {
 let wasSearchSuccessful = false;
 
 window.onload = async function () {
+    let youtubedl;
+    let binaryPath;
+
+    await ipcRenderer.invoke("getAppDirectory").then(value => {
+        binaryPath = path.join(value, "..", "app.asar.unpacked", "node_modules", "youtube-dl-exec", "bin", "yt-dlp.exe");
+        console.log(binaryPath);
+    });
+
+    if (fs.existsSync(binaryPath)) {
+        youtubedl = createYoutubeDl(binaryPath);
+    } else {
+        alert("Error - you messed with the program files - please reinstall");
+    }
+
     let videoDirectory;
 
     await ipcRenderer.invoke("getAppDataDirectory").then(value => {
@@ -31,8 +45,6 @@ window.onload = async function () {
             fs.mkdirSync(videoDirectory);
         }
     });
-
-    console.log(videoDirectory);
 
     document.getElementById("youtube-search").addEventListener("keyup", async function (event) {
         document.getElementById("youtube-search").style.outline = "none";
@@ -48,10 +60,9 @@ window.onload = async function () {
                 if (err) throw err;
     
                 for (const file of files) {
-                    console.log(file);
-                    // fs.unlink(path.join(videoDirectory, file), err => {
-                    //     if (err) throw err;
-                    // });
+                    fs.unlink(path.join(videoDirectory, file), err => {
+                        if (err) throw err;
+                    });
                 }
             });
 
@@ -85,6 +96,7 @@ window.onload = async function () {
                 ipcRenderer.invoke("changeVideoYoutube", videoPath, videoTitle);
             } catch (error) {
                 document.getElementById("youtube-search").style.outline = "1px solid red";
+                console.log(error);
             } finally {
                 document.getElementById("loading-text").style.visibility = "hidden";
                 document.getElementById("time-notice").style.visibility = "hidden";

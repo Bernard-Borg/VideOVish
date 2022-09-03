@@ -4,7 +4,7 @@
   "main": "main.js",
   "author": "Bernard Borg",
   "license": "GNU GPLv3",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "scripts": {
     "postinstall": "install-app-deps",
     "start": "electron .",
@@ -35,7 +35,10 @@
     ],
     "nsis": {
       "perMachine": true
-    }
+    },
+    "asarUnpack": [
+      "**/app/node_modules/youtube-dl-exec/*"
+    ]
   },
   "repository": "https://github.com/Bernard-Borg/VideoPlayerApp",
   "keywords": [

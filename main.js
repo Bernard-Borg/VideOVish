@@ -71,6 +71,10 @@ ipcMain.handle("changeVideoYoutube", (e, videoPath, videoTitle) => {
     youtubeSelectorWindow.destroy();
 });
 
+ipcMain.handle("getAppDirectory", () => {
+    return app.getAppPath();
+});
+
 ipcMain.handle("getAppDataDirectory", () => {
     return app.getPath('userData');
 });
