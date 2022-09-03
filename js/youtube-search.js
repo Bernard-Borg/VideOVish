@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { v4: uuidv4 } = require('uuid');
-const { ipcRenderer } = require("electron");
+const { ipcRenderer, webFrame } = require("electron");
 
 function animateLoadingText() {
     let loadingText = document.getElementById("loading-text");
@@ -22,6 +22,16 @@ function animateLoadingText() {
 let wasSearchSuccessful = false;
 
 window.onload = async function () {
+    webFrame.setZoomFactor(1);
+    webFrame.setVisualZoomLevelLimits(1, 1);
+
+    document.addEventListener("keyup", async function (event) {
+        if (event.key == "Escape") {
+            await ipcRenderer.invoke("closeSecondaryWindow");
+            return;
+        }
+    });
+
     let youtubedl;
     let binaryPath;
 

@@ -4,6 +4,7 @@ const path = require("path");
 
 let mainWindow;
 let youtubeSelectorWindow;
+let secondaryWindow = null;
 
 function createWindow() {
     const mainWindow = new BrowserWindow({
@@ -79,6 +80,12 @@ ipcMain.handle("getAppDataDirectory", () => {
     return app.getPath('userData');
 });
 
+ipcMain.handle("closeSecondaryWindow", () => {
+    if (secondaryWindow != null) {
+        secondaryWindow.destroy();
+    }
+});
+
 ipcMain.handle("showHelpModal", (e) => {
     const helpWindow = new BrowserWindow({
         width: 1024,
@@ -104,6 +111,8 @@ ipcMain.handle("showHelpModal", (e) => {
     helpWindow.on("blur", () => {
         helpWindow.destroy();
     });
+
+    secondaryWindow = helpWindow;
 });
 
 ipcMain.handle("showYoutubeModal", (e) => {
@@ -131,4 +140,6 @@ ipcMain.handle("showYoutubeModal", (e) => {
     youtubeSelectorWindow.on("blur", () => {
         youtubeSelectorWindow.destroy();
     });
+
+    secondaryWindow = youtubeSelectorWindow;
 });
