@@ -22,9 +22,17 @@ function animateLoadingText() {
 let wasSearchSuccessful = false;
 
 window.onload = async function () {
+    //Disable zooming
     webFrame.setZoomFactor(1);
     webFrame.setVisualZoomLevelLimits(1, 1);
 
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "+" && event.ctrlKey) {
+            event.preventDefault();
+        }
+    });
+
+    //Close window when Escape is pressed
     document.addEventListener("keyup", async function (event) {
         if (event.key == "Escape") {
             await ipcRenderer.invoke("closeSecondaryWindow");
@@ -35,19 +43,28 @@ window.onload = async function () {
     let youtubedl;
     let binaryPath;
 
+    //Get directory to youtube-dl-exec binary
     await ipcRenderer.invoke("getAppDirectory").then(value => {
+        if (value == null) {
+            binaryPath = null;
+        }
+
         binaryPath = path.join(value, "..", "app.asar.unpacked", "node_modules", "youtube-dl-exec", "bin", "yt-dlp.exe");
-        console.log(binaryPath);
     });
 
-    if (fs.existsSync(binaryPath)) {
-        youtubedl = createYoutubeDl(binaryPath);
+    if (binaryPath != null) {
+        if (fs.existsSync(binaryPath)) {
+            youtubedl = createYoutubeDl(binaryPath);
+        } else {
+            alert("Error - you messed with the program files - please reinstall");
+        }
     } else {
-        alert("Error - you messed with the program files - please reinstall");
+        youtubedl = require('youtube-dl-exec');
     }
 
     let videoDirectory;
 
+    //Get path to AppData
     await ipcRenderer.invoke("getAppDataDirectory").then(value => {
         videoDirectory = path.join(value, "youtube-downloads");
 

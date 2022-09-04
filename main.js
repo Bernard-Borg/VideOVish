@@ -73,6 +73,10 @@ ipcMain.handle("changeVideoYoutube", (e, videoPath, videoTitle) => {
 });
 
 ipcMain.handle("getAppDirectory", () => {
+    if (process.env.NODE_ENV == "Development") {
+        return null;
+    }
+
     return app.getAppPath();
 });
 
