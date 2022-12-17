@@ -1,10 +1,10 @@
 {
-  "name": "VideoPlayerApp",
+  "name": "VideOVish",
   "description": "A minimalistic video player!",
   "main": "main.js",
   "author": "Bernard Borg",
   "license": "GNU GPLv3",
-  "version": "1.4.4",
+  "version": "1.4.6",
   "scripts": {
     "postinstall": "install-app-deps",
     "start": "electron .",
@@ -12,7 +12,7 @@
     "dist": "electron-builder"
   },
   "build": {
-    "appId": "com.bernardborg.videoplayerapp",
+    "appId": "com.bernardborg.videovish",
     "win": {
       "target": "nsis",
       "icon": "VideoPlayerIcon.ico"

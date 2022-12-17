@@ -37,6 +37,7 @@ function getVideo(ignoreSrc = false) {
 
     if (!ignoreSrc && video.src == "") {
         alert("Press Ctrl+O to select a video to play");
+        return undefined;
     }
 
     return video;
@@ -97,21 +98,23 @@ function updateVideoInformation(video = null) {
         theVideo = getVideo();
     }
 
-    let time = Math.round(theVideo.currentTime).toString().toHHMMSS();
+    if (theVideo) {
+        let time = Math.round(theVideo.currentTime).toString().toHHMMSS();
 
-    if (theVideo.currentTime == theVideo.duration) {
-        time = theVideo.duration.toString().toHHMMSS();
-        document.getElementById("play-icon").style.display = "block";
-        document.getElementById("pause-icon").style.display = "none";
+        if (theVideo.currentTime == theVideo.duration) {
+            time = theVideo.duration.toString().toHHMMSS();
+            document.getElementById("play-icon").style.display = "block";
+            document.getElementById("pause-icon").style.display = "none";
+        }
+
+        document.getElementById("video-current-time").innerText = time;
+        document.getElementById("progress-bar-circle").style.marginLeft = `${
+            (theVideo.currentTime / theVideo.duration) * 100
+        }%`;
+        document.getElementById("progress-color").style.width = `${
+            (theVideo.currentTime / theVideo.duration) * 100
+        }%`;
     }
-
-    document.getElementById("video-current-time").innerText = time;
-    document.getElementById("progress-bar-circle").style.marginLeft = `${
-        (theVideo.currentTime / theVideo.duration) * 100
-    }%`;
-    document.getElementById("progress-color").style.width = `${
-        (theVideo.currentTime / theVideo.duration) * 100
-    }%`;
 }
 
 function updatePlaybackText(video = null) {
@@ -123,8 +126,9 @@ function updatePlaybackText(video = null) {
         theVideo = getVideo();
     }
 
-    document.getElementById("playspeed-indicator").innerText =
-        theVideo.playbackRate.toFixed(2);
+    if (theVideo) {
+        document.getElementById("playspeed-indicator").innerText = theVideo.playbackRate.toFixed(2);
+    }
 }
 
 function getVolumeIcon(volume) {
@@ -144,65 +148,75 @@ function getVolumeIcon(volume) {
 function increaseVolume() {
     let video = getVideo();
 
-    if (video.volume < 1) {
-        video.volume = (video.volume + 0.1).toFixed(1);
-    }
+    if (video) {
+        if (video.volume < 1) {
+            video.volume = (video.volume + 0.1).toFixed(1);
+        }
 
-    displayTransformationAlert(
-        getVolumeIcon(video.volume),
-        `${video.volume.toFixed(1) * 100}%`
-    );
+        displayTransformationAlert(
+            getVolumeIcon(video.volume),
+            `${video.volume.toFixed(1) * 100}%`
+        );
+    }
 }
 
 function decreaseVolume() {
     let video = getVideo();
 
-    if (video.volume > 0) {
-        video.volume = (video.volume - 0.1).toFixed(1);
-    }
+    if (video) {
+        if (video.volume > 0) {
+            video.volume = (video.volume - 0.1).toFixed(1);
+        }
 
-    displayTransformationAlert(
-        getVolumeIcon(video.volume),
-        `${video.volume.toFixed(1) * 100}%`
-    );
+        displayTransformationAlert(
+            getVolumeIcon(video.volume),
+            `${video.volume.toFixed(1) * 100}%`
+        );
+    }
 }
 
 function forwardVideo(amount) {
     let video = getVideo();
 
-    if (video.currentTime <= video.duration - amount) {
-        video.currentTime += amount;
+    if (video) {
+        if (video.currentTime <= video.duration - amount) {
+            video.currentTime += amount;
+        }
+
+        displayTransformationAlert(
+            `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M496 48V192c0 17.69-14.31 32-32 32H320c-17.69 0-32-14.31-32-32s14.31-32 32-32h63.39c-29.97-39.7-77.25-63.78-127.6-63.78C167.7 96.22 96 167.9 96 256s71.69 159.8 159.8 159.8c34.88 0 68.03-11.03 95.88-31.94c14.22-10.53 34.22-7.75 44.81 6.375c10.59 14.16 7.75 34.22-6.375 44.81c-39.03 29.28-85.36 44.86-134.2 44.86C132.5 479.9 32 379.4 32 256s100.5-223.9 223.9-223.9c69.15 0 134 32.47 176.1 86.12V48c0-17.69 14.31-32 32-32S496 30.31 496 48z"/></svg>`,
+            `${amount}s`
+        );
+
+        updateVideoInformation();
     }
-
-    displayTransformationAlert(
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M496 48V192c0 17.69-14.31 32-32 32H320c-17.69 0-32-14.31-32-32s14.31-32 32-32h63.39c-29.97-39.7-77.25-63.78-127.6-63.78C167.7 96.22 96 167.9 96 256s71.69 159.8 159.8 159.8c34.88 0 68.03-11.03 95.88-31.94c14.22-10.53 34.22-7.75 44.81 6.375c10.59 14.16 7.75 34.22-6.375 44.81c-39.03 29.28-85.36 44.86-134.2 44.86C132.5 479.9 32 379.4 32 256s100.5-223.9 223.9-223.9c69.15 0 134 32.47 176.1 86.12V48c0-17.69 14.31-32 32-32S496 30.31 496 48z"/></svg>`,
-        `${amount}s`
-    );
-
-    updateVideoInformation();
 }
 
 function rewindVideo(amount) {
     let video = getVideo();
 
-    if (video.currentTime >= amount) {
-        video.currentTime -= amount;
-    } else {
-        video.currentTime = 0;
+    if (video) {
+        if (video.currentTime >= amount) {
+            video.currentTime -= amount;
+        } else {
+            video.currentTime = 0;
+        }
+
+        displayTransformationAlert(
+            `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M480 256c0 123.4-100.5 223.9-223.9 223.9c-48.86 0-95.19-15.58-134.2-44.86c-14.14-10.59-17-30.66-6.391-44.81c10.61-14.09 30.69-16.97 44.8-6.375c27.84 20.91 61 31.94 95.89 31.94C344.3 415.8 416 344.1 416 256s-71.67-159.8-159.8-159.8C205.9 96.22 158.6 120.3 128.6 160H192c17.67 0 32 14.31 32 32S209.7 224 192 224H48c-17.67 0-32-14.31-32-32V48c0-17.69 14.33-32 32-32s32 14.31 32 32v70.23C122.1 64.58 186.1 32.11 256.1 32.11C379.5 32.11 480 132.6 480 256z"/></svg>`,
+            `${amount}s`
+        );
+
+        updateVideoInformation();
     }
-
-    displayTransformationAlert(
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M480 256c0 123.4-100.5 223.9-223.9 223.9c-48.86 0-95.19-15.58-134.2-44.86c-14.14-10.59-17-30.66-6.391-44.81c10.61-14.09 30.69-16.97 44.8-6.375c27.84 20.91 61 31.94 95.89 31.94C344.3 415.8 416 344.1 416 256s-71.67-159.8-159.8-159.8C205.9 96.22 158.6 120.3 128.6 160H192c17.67 0 32 14.31 32 32S209.7 224 192 224H48c-17.67 0-32-14.31-32-32V48c0-17.69 14.33-32 32-32s32 14.31 32 32v70.23C122.1 64.58 186.1 32.11 256.1 32.11C379.5 32.11 480 132.6 480 256z"/></svg>`,
-        `${amount}s`
-    );
-
-    updateVideoInformation();
 }
 
 function seekVideoSection(videoSection) {
     let video = getVideo();
 
-    video.currentTime = videoSection * video.duration;
+    if (video) {
+        video.currentTime = videoSection * video.duration;
+    }
 }
 
 async function setFullscreen(isF11) {
@@ -222,46 +236,50 @@ async function setFullscreen(isF11) {
 function playVideo() {
     let video = getVideo();
 
-    if (video.paused) {
-        video.play();
-        document.getElementById("play-icon").style.display = "none";
-        document.getElementById("pause-icon").style.display = "block";
+    if (video) {
+        if (video.paused) {
+            video.play();
+            document.getElementById("play-icon").style.display = "none";
+            document.getElementById("pause-icon").style.display = "block";
 
-        let intervalDuration = video.playbackRate * 1000;
-        playingVideoInterval = setInterval(
-            updateVideoInformation,
-            intervalDuration
-        );
+            let intervalDuration = video.playbackRate * 1000;
+            playingVideoInterval = setInterval(
+                updateVideoInformation,
+                intervalDuration
+            );
 
-        displayTransformationAlert(
-            ' <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M361 215C375.3 223.8 384 239.3 384 256C384 272.7 375.3 288.2 361 296.1L73.03 472.1C58.21 482 39.66 482.4 24.52 473.9C9.377 465.4 0 449.4 0 432V80C0 62.64 9.377 46.63 24.52 38.13C39.66 29.64 58.21 29.99 73.03 39.04L361 215z"/></svg>'
-        )
-    } else {
-        video.pause();
-        document.getElementById("play-icon").style.display = "block";
-        document.getElementById("pause-icon").style.display = "none";
-        clearInterval(playingVideoInterval);
+            displayTransformationAlert(
+                ' <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M361 215C375.3 223.8 384 239.3 384 256C384 272.7 375.3 288.2 361 296.1L73.03 472.1C58.21 482 39.66 482.4 24.52 473.9C9.377 465.4 0 449.4 0 432V80C0 62.64 9.377 46.63 24.52 38.13C39.66 29.64 58.21 29.99 73.03 39.04L361 215z"/></svg>'
+            )
+        } else {
+            video.pause();
+            document.getElementById("play-icon").style.display = "block";
+            document.getElementById("pause-icon").style.display = "none";
+            clearInterval(playingVideoInterval);
 
-        displayTransformationAlert(
-            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M272 63.1l-32 0c-26.51 0-48 21.49-48 47.1v288c0 26.51 21.49 48 48 48L272 448c26.51 0 48-21.49 48-48v-288C320 85.49 298.5 63.1 272 63.1zM80 63.1l-32 0c-26.51 0-48 21.49-48 48v288C0 426.5 21.49 448 48 448l32 0c26.51 0 48-21.49 48-48v-288C128 85.49 106.5 63.1 80 63.1z"/></svg>'
-        )
+            displayTransformationAlert(
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M272 63.1l-32 0c-26.51 0-48 21.49-48 47.1v288c0 26.51 21.49 48 48 48L272 448c26.51 0 48-21.49 48-48v-288C320 85.49 298.5 63.1 272 63.1zM80 63.1l-32 0c-26.51 0-48 21.49-48 48v288C0 426.5 21.49 448 48 448l32 0c26.51 0 48-21.49 48-48v-288C128 85.49 106.5 63.1 80 63.1z"/></svg>'
+            )
+        }
     }
 }
 
 function changePlayrate(direction) {
     let video = getVideo();
 
-    if (direction == 1) {
-        if (playbackIndex < PLAYBACK_SPEEDS.length - 1) {
-            playbackIndex++;
+    if (video) {
+        if (direction == 1) {
+            if (playbackIndex < PLAYBACK_SPEEDS.length - 1) {
+                playbackIndex++;
+            }
+        } else {
+            if (playbackIndex > 0) {
+                playbackIndex--;
+            }
         }
-    } else {
-        if (playbackIndex > 0) {
-            playbackIndex--;
-        }
-    }
 
-    video.playbackRate = PLAYBACK_SPEEDS[playbackIndex];
+        video.playbackRate = PLAYBACK_SPEEDS[playbackIndex];
+    }
 }
 
 function loopBack() {
@@ -385,7 +403,7 @@ window.onload = async function () {
     if (
         videoArgs.length > 1 &&
         fs.existsSync(videoArgs[1]) &&
-        VALID_EXTENSIONS.includes(path.extname(videoArgs[1]).toLowerCase())
+        VALID_EXTENSIONS.includes((path.extname(videoArgs[1]).toLowerCase()).substring(1, (path.extname(videoArgs[1]).toLowerCase()).length))
     ) {
         setVideoSource(videoArgs[1]);
     } else {
@@ -394,14 +412,16 @@ window.onload = async function () {
 
     let video = getVideo();
 
-    updatePlaybackText(video);
-    updateVideoInformation(video);
+    if (video) {
+        updatePlaybackText(video);
+        updateVideoInformation(video);
 
-    video.onloadedmetadata = function () {
-        document.getElementById("video-duration").innerText = video.duration
-            .toString()
-            .toHHMMSS();
-    };
+        video.onloadedmetadata = function () {
+            document.getElementById("video-duration").innerText = video.duration
+                .toString()
+                .toHHMMSS();
+        };
+    }
 
     document
         .getElementById("progress-bar")
