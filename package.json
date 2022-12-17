@@ -4,7 +4,7 @@
     "main": "main.js",
     "author": "Bernard Borg",
     "license": "GNU GPLv3",
-    "version": "1.4.7",
+    "version": "1.4.8",
     "scripts": {
         "postinstall": "install-app-deps",
         "start": "electron .",
@@ -50,7 +50,7 @@
     ],
     "devDependencies": {
         "electron": "^22.0.0",
-        "electron-builder": "^23.3.3"
+        "electron-builder": "^23.6.0"
     },
     "dependencies": {
         "jquery": "^3.6.0",
