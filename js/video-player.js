@@ -108,12 +108,10 @@ function updateVideoInformation(video = null) {
         }
 
         document.getElementById("video-current-time").innerText = time;
-        document.getElementById("progress-bar-circle").style.marginLeft = `${
-            (theVideo.currentTime / theVideo.duration) * 100
-        }%`;
-        document.getElementById("progress-color").style.width = `${
-            (theVideo.currentTime / theVideo.duration) * 100
-        }%`;
+        document.getElementById("progress-bar-circle").style.marginLeft = `${(theVideo.currentTime / theVideo.duration) * 100
+            }%`;
+        document.getElementById("progress-color").style.width = `${(theVideo.currentTime / theVideo.duration) * 100
+            }%`;
     }
 }
 
@@ -354,7 +352,7 @@ async function showHelpModal() {
     if (!video.paused) {
         playVideo();
     }
-    
+
     await ipcRenderer.invoke("showHelpModal");
 }
 
@@ -389,7 +387,7 @@ function hideUI() {
 window.onload = async function () {
     let videoArgs;
 
-    ipcRenderer.on("youtube-video-path", function(event, data) {
+    ipcRenderer.on("youtube-video-path", function (event, data) {
         const [videoPath, ...rest] = data.split("*");
         const videoTitle = rest.join("*");
 
@@ -428,7 +426,7 @@ window.onload = async function () {
         .addEventListener("click", function (event) {
             seekVideoSection(
                 event.offsetX /
-                    document.getElementById("progress-bar").clientWidth
+                document.getElementById("progress-bar").clientWidth
             );
             updateVideoInformation();
         });
@@ -524,7 +522,7 @@ window.onload = async function () {
         .getElementById("youtube-button")
         .addEventListener("click", function (e) {
             showYoutubeModal();
-            
+
             //The following is to prevent the modal from being opened again when pressing space after it has been closed
             document.getElementById("youtube-button").blur();
         });

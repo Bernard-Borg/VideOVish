@@ -26,7 +26,7 @@ window.onload = async function () {
     webFrame.setZoomFactor(1);
     webFrame.setVisualZoomLevelLimits(1, 1);
 
-    document.addEventListener("keydown", function(event) {
+    document.addEventListener("keydown", function (event) {
         if (event.key === "+" && event.ctrlKey) {
             event.preventDefault();
         }
@@ -76,7 +76,7 @@ window.onload = async function () {
     document.getElementById("youtube-search").addEventListener("keyup", async function (event) {
         document.getElementById("youtube-search").style.outline = "none";
 
-        if(event.key == "Enter") {
+        if (event.key == "Enter") {
             //Prevents user from clicking enter multiple times
             if (wasSearchSuccessful) {
                 return;
@@ -85,7 +85,7 @@ window.onload = async function () {
             //Clears any previously loaded videos from youtube-downloads directory
             fs.readdir(videoDirectory, (err, files) => {
                 if (err) throw err;
-    
+
                 for (const file of files) {
                     fs.unlink(path.join(videoDirectory, file), err => {
                         if (err) throw err;

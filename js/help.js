@@ -1,10 +1,10 @@
 const { ipcRenderer, webFrame } = require('electron')
 
-window.onload = function() {
+window.onload = function () {
     webFrame.setZoomFactor(0.75);
     webFrame.setVisualZoomLevelLimits(1, 1);
 
-    document.addEventListener("keydown", function(event) {
+    document.addEventListener("keydown", function (event) {
         if (event.key === "+" && event.ctrlKey) {
             event.preventDefault();
         }
