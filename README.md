@@ -11,7 +11,8 @@ The feature set and interface of the video player was inspired by both Windows' 
 - Video seeking (hotkeys 0 - 9, similar to the YouTube player)
 - Loop mode
 - Full screen mode
+- Playing a video from Youtube (using the URL)
 
 ## App screenshot
 
-![image](https://user-images.githubusercontent.com/35971384/184998862-49ff3528-0dc0-456e-8791-338424db9655.png)
+![image](https://user-images.githubusercontent.com/35971384/208214326-63067413-8acc-4e0b-b727-5fb9f56456bc.png)
