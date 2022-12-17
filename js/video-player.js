@@ -32,6 +32,8 @@ let loopMode = false;
     });
 })(jQuery);
 
+// Gets the video element (ignoreSrc = true is used for function calls that do not require 
+// a video to be present (for example, showing modals (to pause the video))
 function getVideo(ignoreSrc = false) {
     let video = document.getElementById("video-player");
 
@@ -69,6 +71,8 @@ function fadeTransformationAlert() {
     $("#transformation-alert").fadeOut();
 }
 
+// A transformation alert shows up in the top right of the screen when the user 
+// does certain interactions (like increasing volumew)
 function displayTransformationAlert(icon, text = null) {
     clearTimeout(transformationTimeout);
 
@@ -89,6 +93,7 @@ function displayTransformationAlert(icon, text = null) {
     transformationTimeout = setTimeout(fadeTransformationAlert, 750);
 }
 
+// Updates the video's information, such as the progress bar and correctly shows whether the video is playing or paused
 function updateVideoInformation(video = null) {
     let theVideo;
 
@@ -115,6 +120,7 @@ function updateVideoInformation(video = null) {
     }
 }
 
+// Updates the text showing the playback speed
 function updatePlaybackText(video = null) {
     let theVideo;
 
@@ -262,6 +268,7 @@ function playVideo() {
     }
 }
 
+// Changes the playing speed of the video up or down depending on pre-set playback speeds
 function changePlayrate(direction) {
     let video = getVideo();
 
@@ -280,12 +287,14 @@ function changePlayrate(direction) {
     }
 }
 
+// Loops the video
 function loopBack() {
     let videoPlayer = document.getElementById("video-player");
     videoPlayer.currentTime = 0;
     videoPlayer.play();
 }
 
+// Sets whether the video should loop when finished or not
 function setLoopMode() {
     if (loopMode) {
         document.querySelector(
@@ -306,10 +315,12 @@ function setLoopMode() {
     loopMode = !loopMode;
 }
 
+// Sets the window title
 function setTitle(title) {
     document.getElementById("video-title").innerText = title;
 }
 
+// Sets the src and type of the video
 function setVideoSource(filepath, title = undefined) {
     if (title == undefined) {
         title = path.parse(filepath).name;
@@ -329,13 +340,14 @@ function setVideoSource(filepath, title = undefined) {
     } else if (fileExtension.toLowerCase() == ".mp4") {
         type = "video/mp4";
     } else {
-        console.warn("WARNING: file type not supported");
+        console.warn("WARNING: file type might not work properly");
     }
 
     video.type = type;
     playVideo();
 }
 
+// Shows the file dialog to pick a video to play
 async function showVideoDialog() {
     await ipcRenderer.invoke("showDialog", VALID_EXTENSIONS).then((result) => {
         let videoPath = result.filePaths[0];
@@ -346,6 +358,7 @@ async function showVideoDialog() {
     });
 }
 
+// Shows the help modal
 async function showHelpModal() {
     let video = getVideo(true);
 
@@ -356,6 +369,7 @@ async function showHelpModal() {
     await ipcRenderer.invoke("showHelpModal");
 }
 
+// Shows the youtube video picker modal
 async function showYoutubeModal() {
     let video = getVideo(true);
 
@@ -366,6 +380,7 @@ async function showYoutubeModal() {
     await ipcRenderer.invoke("showYoutubeModal");
 }
 
+// Shows UI elements (like video controls and progress bar)
 function showUI() {
     let videoControls = document.getElementById("video-controls");
     videoControls.style.display = "flex";
@@ -375,6 +390,7 @@ function showUI() {
     progressBar.style.display = "flex";
 }
 
+// Hides UI elements (like video controls and prrogoress bar)
 function hideUI() {
     let videoControls = document.getElementById("video-controls");
     videoControls.style.display = "none";
@@ -387,6 +403,7 @@ function hideUI() {
 window.onload = async function () {
     let videoArgs;
 
+    // Handles the ipcRenderer event emitted when the user picks a youtube video
     ipcRenderer.on("youtube-video-path", function (event, data) {
         const [videoPath, ...rest] = data.split("*");
         const videoTitle = rest.join("*");
@@ -398,6 +415,7 @@ window.onload = async function () {
         videoArgs = result;
     });
 
+    // Sets the video if the user does Open With or calls the program with a CLI path, otherwise shows the file dialog
     if (
         videoArgs.length > 1 &&
         fs.existsSync(videoArgs[1]) &&
@@ -410,6 +428,7 @@ window.onload = async function () {
 
     let video = getVideo();
 
+    // Initialise video information if the usere does Open With or calls the program with a CLI path 
     if (video) {
         updatePlaybackText(video);
         updateVideoInformation(video);
@@ -421,6 +440,10 @@ window.onload = async function () {
         };
     }
 
+    /*
+        EVENT LISTENERS
+    */
+   
     document
         .getElementById("progress-bar")
         .addEventListener("click", function (event) {

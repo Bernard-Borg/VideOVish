@@ -5,6 +5,7 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const { ipcRenderer, webFrame } = require("electron");
 
+// Loading... animation
 function animateLoadingText() {
     let loadingText = document.getElementById("loading-text");
 
@@ -21,18 +22,20 @@ function animateLoadingText() {
 
 let wasSearchSuccessful = false;
 
+// Window setup and main logic
 window.onload = async function () {
-    //Disable zooming
+    // Disable zooming
     webFrame.setZoomFactor(1);
     webFrame.setVisualZoomLevelLimits(1, 1);
 
+    // Prevents the default zooming behaviour when + is prressed
     document.addEventListener("keydown", function (event) {
         if (event.key === "+" && event.ctrlKey) {
             event.preventDefault();
         }
     });
 
-    //Close window when Escape is pressed
+    // Close window when Escape is pressed
     document.addEventListener("keyup", async function (event) {
         if (event.key == "Escape") {
             await ipcRenderer.invoke("closeSecondaryWindow");
@@ -43,7 +46,7 @@ window.onload = async function () {
     let youtubedl;
     let binaryPath;
 
-    //Get directory to youtube-dl-exec binary
+    // Get directory to youtube-dl-exec binary
     await ipcRenderer.invoke("getAppDirectory").then(value => {
         if (value == null) {
             binaryPath = null;
@@ -56,6 +59,8 @@ window.onload = async function () {
         if (fs.existsSync(binaryPath)) {
             youtubedl = createYoutubeDl(binaryPath);
         } else {
+            // This alert shows up in development mode when trying to do youtube video since the binaryPath is not found
+            // Haven't gotten around to using ENV variables to alter the binary path in development mode
             alert("Error - you messed with the program files - please reinstall");
         }
     } else {
@@ -64,7 +69,7 @@ window.onload = async function () {
 
     let videoDirectory;
 
-    //Get path to AppData
+    // Get path to AppData
     await ipcRenderer.invoke("getAppDataDirectory").then(value => {
         videoDirectory = path.join(value, "youtube-downloads");
 
@@ -77,12 +82,12 @@ window.onload = async function () {
         document.getElementById("youtube-search").style.outline = "none";
 
         if (event.key == "Enter") {
-            //Prevents user from clicking enter multiple times
+            // Prevents user from clicking enter multiple times
             if (wasSearchSuccessful) {
                 return;
             }
 
-            //Clears any previously loaded videos from youtube-downloads directory
+            // Clears any previously loaded videos from youtube-downloads directory
             fs.readdir(videoDirectory, (err, files) => {
                 if (err) throw err;
 
@@ -100,6 +105,7 @@ window.onload = async function () {
             let videoTitle = "";
             let animationInterval;
 
+            // Gets the youtube video using youtube-dl
             try {
                 document.getElementById("loading-text").style.visibility = "visible";
                 animationInterval = setInterval(animateLoadingText, 150);
