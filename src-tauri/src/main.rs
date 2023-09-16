@@ -11,7 +11,8 @@ async fn show_help_window(handle: tauri::AppHandle) {
     .inner_size(1024.0, 768.0)
     .min_inner_size(480.0, 480.0)
     .skip_taskbar(true)
-    .title("Help")
+    .decorations(false)
+    .transparent(true)
     .build()
     .unwrap();
 }
@@ -25,6 +26,8 @@ async fn show_youtube_modal(handle: tauri::AppHandle) {
     )
     .inner_size(680.0, 250.0)
     .min_inner_size(480.0, 200.0)
+    .decorations(false)
+    .transparent(true)
     .build()
     .unwrap();
 }

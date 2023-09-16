@@ -1,7 +1,8 @@
 <template>
-    <div id="main-div" @keyup:Escape="closeWindow">
+    <div id="main-div">
         <div id="header-div">
             <h1>Keyboard Shortcuts</h1>
+            <X color="white" @click="closeWindow" />
         </div>
         <div id="info-div">
             <div class="info-container">
@@ -60,14 +61,24 @@
 
 <script setup lang="ts">
 import { WebviewWindow } from "@tauri-apps/api/window";
+import { X } from "lucide-vue-next";
+import { onMounted, onUnmounted } from "vue";
 
 const closeWindow = async () => {
     await WebviewWindow.getByLabel("help")?.close();
 };
 
-window.addEventListener("keydown", (e) => {
+const eventHandler = (e: KeyboardEvent) => {
     if (e.code === "Escape") {
         closeWindow();
     }
+};
+
+onMounted(() => {
+    window.addEventListener("keydown", eventHandler);
+});
+
+onUnmounted(() => {
+    window.removeEventListener("keydown", eventHandler);
 });
 </script>

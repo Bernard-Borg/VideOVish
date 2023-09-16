@@ -36,7 +36,6 @@ body {
     width: 100px;
     height: 100px;
     right: 0px;
-    visibility: hidden;
 }
 
 #transformation-icon {
@@ -139,7 +138,7 @@ video {
     height: 16px;
     background-color: red;
     position: relative;
-    top: -8px;
+    top: -11px;
     pointer-events: none;
 }
 
@@ -147,7 +146,7 @@ video {
     width: 0%;
     background-color: red;
     height: 3px;
-    outline: 2px solid red;
+    border: 2px solid red;
 }
 
 #video-info-container {
@@ -156,6 +155,7 @@ video {
 
 #video-current-time {
     float: left;
+    pointer-events: none;
 }
 
 #video-duration {
