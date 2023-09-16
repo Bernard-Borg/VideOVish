@@ -4,6 +4,10 @@ main {
     height: 100%;
 }
 
+#app {
+    width: 100%;
+}
+
 body {
     margin: 0;
     overflow: hidden;
@@ -11,9 +15,9 @@ body {
 
 #playspeed-indicator,
 #transformation-text,
-#video-info-container>span {
+#video-info-container > span {
     color: white;
-    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-family: "Inter", "Segoe UI", sans-serif;
 }
 
 #playspeed-indicator {
@@ -52,7 +56,7 @@ body {
     justify-content: center;
     align-items: center;
     color: white;
-    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-family: "Inter", "Segoe UI", sans-serif;
 }
 
 #main-video {
@@ -81,8 +85,8 @@ video {
     width: 100%;
 }
 
-#video-controls>button,
-#top-bar>button {
+#video-controls > button,
+#top-bar > button {
     width: 75px;
     height: 75px;
     background-color: transparent;
@@ -91,7 +95,7 @@ video {
     border: none;
 }
 
-#top-bar>button {
+#top-bar > button {
     width: 30px;
     height: 30px;
     padding: 5px;
@@ -109,6 +113,7 @@ video {
 
 .svg-container {
     display: flex;
+    justify-content: center;
     align-items: center;
     height: 100%;
 }
@@ -165,6 +170,6 @@ path {
     fill: red;
 }
 
-#video-controls>button:focus {
+#video-controls > button:focus {
     outline: 3px solid white;
 }

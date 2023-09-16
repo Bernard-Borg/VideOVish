@@ -1,15 +1,5 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com">
-    <link href="../css/help.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <div id="main-div">
+<template>
+    <div id="main-div" @keyup:Escape="closeWindow">
         <div id="header-div">
             <h1>Keyboard Shortcuts</h1>
         </div>
@@ -37,7 +27,9 @@
                 <div class="key">↓</div>
                 <h3>SEEK LOCATION</h3>
                 <div class="key-container">
-                    <div class="key">0</div><span class="key-symbol">-</span><div class="key">9</div>
+                    <div class="key">0</div>
+                    <span class="key-symbol">-</span>
+                    <div class="key">9</div>
                 </div>
             </div>
             <div class="info-container">
@@ -45,19 +37,37 @@
                 <p>These shortcuts have to do with managing the app itself.</p>
                 <h3>HELP MENU</h3>
                 <div class="key-container">
-                    <div class="key">F1</div><span class="key-symbol">/</span><div class="control-key key">CTRL</div><span class="key-symbol">+</span><div class="key">/</div>
+                    <div class="key">F1</div>
+                    <span class="key-symbol">/</span>
+                    <div class="control-key key">CTRL</div>
+                    <span class="key-symbol">+</span>
+                    <div class="key">/</div>
                 </div>
                 <h3>TOGGLE FULLSCREEN</h3>
                 <div class="key">F11</div>
                 <h3>PICK VIDEO TO VIEW</h3>
                 <div class="key-container">
-                    <div class="key control-key">CTRL</div><span class="key-symbol">+</span><div class="key">O</div>
+                    <div class="key control-key">CTRL</div>
+                    <span class="key-symbol">+</span>
+                    <div class="key">O</div>
                 </div>
                 <h3>CLOSE SECONDARY WINDOW</h3>
                 <div class="key">ESC</div>
             </div>
         </div>
     </div>
-    <script type="module" src="../js/help.js" async defer></script>
-  </body>
-</html>
+</template>
+
+<script setup lang="ts">
+import { WebviewWindow } from "@tauri-apps/api/window";
+
+const closeWindow = async () => {
+    await WebviewWindow.getByLabel("help")?.close();
+};
+
+window.addEventListener("keydown", (e) => {
+    if (e.code === "Escape") {
+        closeWindow();
+    }
+});
+</script>

@@ -1,60 +1,29 @@
 {
-    "name": "VideOVish",
-    "description": "A minimalistic video player!",
-    "main": "main.js",
-    "author": "Bernard Borg",
-    "license": "GNU GPLv3",
-    "version": "1.4.8",
+    "name": "videovish-tauri",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
     "scripts": {
-        "postinstall": "install-app-deps",
-        "start": "electron .",
-        "pack": "electron-builder --dir",
-        "dist": "electron-builder"
-    },
-    "build": {
-        "appId": "com.bernardborg.videovish",
-        "win": {
-            "target": "nsis",
-            "icon": "VideoPlayerIcon.ico"
-        },
-        "artifactName": "${productName} Setup ${version}.exe",
-        "fileAssociations": [
-            {
-                "ext": [
-                    "ogg",
-                    "webm",
-                    "mp4",
-                    "mov",
-                    "mkv",
-                    "mp3"
-                ],
-                "name": "Video File",
-                "role": "Editor",
-                "icon": "VideoPlayerIcon.ico"
-            }
-        ],
-        "nsis": {
-            "perMachine": true
-        }
-    },
-    "repository": "https://github.com/Bernard-Borg/VideoPlayerApp",
-    "keywords": [
-        "video",
-        "player",
-        "mp4",
-        "ogg",
-        "webm",
-        "mov",
-        "mkv",
-        "mp3"
-    ],
-    "devDependencies": {
-        "electron": "^22.0.0",
-        "electron-builder": "^23.6.0"
+        "dev": "vite",
+        "build": "vue-tsc --noEmit && vite build",
+        "preview": "vite preview",
+        "tauri": "tauri"
     },
     "dependencies": {
-        "jquery": "^3.6.0",
-        "uuid": "^8.3.2",
-        "youtube-dl-exec": "^2.1.5"
+        "@tauri-apps/api": "^1.4.0",
+        "@vueuse/core": "^10.4.1",
+        "jquery": "^3.7.1",
+        "lucide-vue-next": "^0.279.0",
+        "uuid": "^9.0.1",
+        "vue": "^3.3.4",
+        "vue-router": "^4.2.4"
+    },
+    "devDependencies": {
+        "@tauri-apps/cli": "^1.4.0",
+        "@types/jquery": "^3.5.19",
+        "@vitejs/plugin-vue": "^4.2.3",
+        "typescript": "^5.0.2",
+        "vite": "^4.4.4",
+        "vue-tsc": "^1.8.5"
     }
 }
