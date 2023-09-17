@@ -42,6 +42,7 @@ getCurrent().onCloseRequested(() => {
 const youtubeButton = ref<HTMLButtonElement | null>(null);
 const progressBar = ref<HTMLDivElement | null>(null);
 const videoPlayer = ref<HTMLVideoElement | null>(null);
+const progressCircle = ref<HTMLDivElement | null>(null);
 
 const looping = ref<boolean>();
 const isFullscreen = ref<boolean>(false);
@@ -412,7 +413,11 @@ onUnmounted(() => {
         >
             <div id="progress-bar" ref="progressBar">
                 <div id="progress-color" :style="{ width: `${(currentTime / duration) * 100}%` }"></div>
-                <div id="progress-bar-circle" :style="{ marginLeft: `${(currentTime / duration) * 100}%` }"></div>
+                <div
+                    id="progress-bar-circle"
+                    ref="progressCircle"
+                    :style="{ marginLeft: `${(currentTime / duration) * 100}%` }"
+                ></div>
             </div>
         </div>
         <div id="video-info-container">
@@ -436,7 +441,7 @@ onUnmounted(() => {
                     <Repeat :color="looping ? 'limegreen' : 'white'" />
                 </div>
             </button>
-            <button id="volume-button" @click="volume ? mute : unmute">
+            <button id="volume-button" @click="volume ? mute() : unmute()">
                 <div class="svg-container">
                     <VolumeX v-if="!volume" color="white" />
                     <Volume2 v-else color="white" />
