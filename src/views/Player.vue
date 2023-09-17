@@ -449,7 +449,7 @@ onUnmounted(() => {
             background: uiHidden ? 'transparent' : 'linear-gradient(transparent, black)'
         }"
     >
-        <div>
+        <div style="display: flex; justify-content: start">
             <button id="loop-button" @click="setLoopMode">
                 <div class="svg-container">
                     <Repeat :color="looping ? 'limegreen' : 'white'" />
@@ -462,7 +462,7 @@ onUnmounted(() => {
                 </div>
             </button>
         </div>
-        <div>
+        <div style="display: flex; justify-content: center">
             <button id="rewind-button" @click="() => rewindVideo(5)">
                 <div class="svg-container">
                     <Rewind color="white" />
@@ -480,7 +480,7 @@ onUnmounted(() => {
                 </div>
             </button>
         </div>
-        <div>
+        <div style="display: flex; justify-content: end">
             <button id="maximise-button" @click="() => setFullscreen()">
                 <div class="svg-container">
                     <Minimize color="white" v-if="isFullscreen" />
@@ -492,7 +492,12 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-#video-controls > button:focus {
+#video-controls div {
+    flex-grow: 1;
+    flex-basis: 0;
+}
+
+#video-controls button:focus {
     outline: 3px solid white;
 }
 
