@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeMount, onMounted, onUnmounted, ref } from "vue";
+import { onBeforeMount, onMounted, onUnmounted, ref, computed } from "vue";
 import { invoke } from "@tauri-apps/api";
 import { getMatches } from "@tauri-apps/api/cli";
 import { open } from "@tauri-apps/api/dialog";
@@ -8,7 +8,7 @@ import { exists } from "@tauri-apps/api/fs";
 import { basename, extname } from "@tauri-apps/api/path";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { getCurrent, appWindow, getAll } from "@tauri-apps/api/window";
-import { useMediaControls, useThrottleFn, useTimeoutFn } from "@vueuse/core";
+import { useDraggable, useMediaControls, useThrottleFn, useTimeoutFn } from "@vueuse/core";
 import {
     Info,
     Play,
@@ -56,8 +56,24 @@ const videoTitle = ref<string>();
 const transformationIcon = ref<Icon>();
 const transformationText = ref<string>();
 
+const circlePosition = computed(() => (currentTime.value / duration.value) * 100);
+
 const { playing, currentTime, duration, volume, rate } = useMediaControls(videoPlayer, {
     src: videoSrc
+});
+
+const { x } = useDraggable(progressCircle, {
+    axis: "x",
+    onMove: (e) => {
+        if (progressBar.value) {
+            seekVideoSection((e.x - progressBar.value.getBoundingClientRect().x) / progressBar.value.clientWidth);
+        }
+    },
+    onEnd: (e) => {
+        if (progressBar.value) {
+            seekVideoSection((e.x - progressBar.value.getBoundingClientRect().x) / progressBar.value.clientWidth);
+        }
+    }
 });
 
 let playbackIndex = 5;
@@ -372,23 +388,14 @@ onUnmounted(() => {
         </button>
         <button ref="youtubeButton" id="youtube-button" @click="showYoutubeModal">
             <div class="svg-container svg-container-top">
-                <Youtube color="white" />
+                <Youtube fill="red" color="white" />
             </div>
         </button>
-        <div id="drag-bar" style="display: flex">
+        <div id="drag-bar">
             <div style="display: flex; flex-grow: 1; justify-content: center" data-tauri-drag-region>
-                <span id="video-title" style="pointer-events: none; user-select: none">{{ videoTitle }}</span>
+                <span id="video-title">{{ videoTitle }} {{ x }}</span>
             </div>
-            <div
-                style="
-                    float: right;
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-around;
-                    flex-grow: 0;
-                    width: 100px;
-                "
-            >
+            <div id="top-bar-right-buttons">
                 <Minus @click="() => getCurrent().minimize()" color="white" :size="20" />
                 <Square @click="() => getCurrent().maximize()" color="white" :size="20" />
                 <X @click="() => getCurrent().close()" color="white" :size="20" />
@@ -408,15 +415,22 @@ onUnmounted(() => {
     <div id="progress-bar-container" :style="{ display: uiHidden ? 'none' : 'flex' }">
         <div
             id="progress-bar-wrapper"
-            style="display: flex; height: 14px; align-items: center; z-index: 55"
-            @click="(e) => (progressBar ? seekVideoSection(e.offsetX / progressBar.clientWidth) : undefined)"
+            @click="
+                (e) => {
+                    progressBar
+                        ? seekVideoSection((e.x - progressBar.getBoundingClientRect().x) / progressBar.clientWidth)
+                        : undefined;
+                }
+            "
         >
             <div id="progress-bar" ref="progressBar">
                 <div id="progress-color" :style="{ width: `${(currentTime / duration) * 100}%` }"></div>
                 <div
                     id="progress-bar-circle"
                     ref="progressCircle"
-                    :style="{ marginLeft: `${(currentTime / duration) * 100}%` }"
+                    :style="{
+                        left: `${circlePosition}%`
+                    }"
                 ></div>
             </div>
         </div>
@@ -478,6 +492,173 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+#video-controls > button:focus {
+    outline: 3px solid white;
+}
+
+#playspeed-indicator,
+#transformation-text,
+#video-info-container > span {
+    color: white;
+    font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+#playspeed-indicator {
+    position: fixed;
+    top: 30px;
+}
+
+#transformation-alert {
+    border-radius: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    right: 0px;
+}
+
+#transformation-icon {
+    width: 20px;
+}
+
+#top-bar {
+    background-color: #252526;
+    min-height: 30px;
+    display: flex;
+}
+
+#top-bar-right-buttons {
+    float: right;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-grow: 0;
+    width: 100px;
+}
+
+#drag-bar {
+    -webkit-app-region: drag;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+#main-video {
+    background: black;
+    max-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+#video-title {
+    pointer-events: none;
+    user-select: none;
+}
+
+#video-controls {
+    height: 80px;
+    display: flex;
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    background: linear-gradient(transparent, black);
+    width: calc(100% - 32px);
+    justify-content: center;
+    align-items: center;
+}
+
+video {
+    max-height: 100%;
+    width: 100%;
+}
+
+#video-controls button,
+#top-bar > button {
+    width: 75px;
+    height: 75px;
+    background-color: transparent;
+    outline: none;
+    padding: 20px;
+    border: none;
+}
+
+#top-bar > button {
+    width: 30px;
+    height: 30px;
+    padding: 5px;
+}
+
+.svg-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+#video-info-container {
+    margin-top: 5px;
+}
+
+#video-current-time {
+    float: left;
+    pointer-events: none;
+}
+
+#video-duration {
+    float: right;
+}
+
+#progress-bar-wrapper {
+    display: flex;
+    height: 14px;
+    align-items: center;
+    z-index: 55;
+    cursor: pointer;
+}
+
+#progress-bar-container {
+    display: flex;
+    flex-direction: column;
+    width: 95%;
+    bottom: 140px;
+    position: relative;
+    margin: 0 auto;
+}
+
+#progress-bar {
+    background: rgba(255, 255, 255, 0.5);
+    width: 100%;
+    height: 5px;
+}
+
+#progress-bar-circle {
+    border-radius: 100%;
+    width: 16px;
+    height: 16px;
+    background-color: red;
+    outline: 1px solid white;
+    position: absolute;
+    top: 0;
+    cursor: grab;
+    z-index: 60;
+}
+
+#progress-color {
+    width: 0%;
+    background-color: red;
+    height: 3px;
+    border: 2px solid red;
+}
+
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity 0.5s ease;
