@@ -7,7 +7,7 @@ import { listen } from "@tauri-apps/api/event";
 import { exists } from "@tauri-apps/api/fs";
 import { basename, extname } from "@tauri-apps/api/path";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
-import { getCurrent, appWindow, getAll } from "@tauri-apps/api/window";
+import { getCurrent, appWindow, getAll, WebviewWindow } from "@tauri-apps/api/window";
 import { useDraggable, useMediaControls, useThrottleFn, useTimeoutFn } from "@vueuse/core";
 import {
     Info,
@@ -62,7 +62,7 @@ const { playing, currentTime, duration, volume, rate } = useMediaControls(videoP
     src: videoSrc
 });
 
-const { x } = useDraggable(progressCircle, {
+useDraggable(progressCircle, {
     axis: "x",
     onMove: (e) => {
         if (progressBar.value) {
@@ -260,6 +260,12 @@ const showHelpWindow = async () => {
         playVideo();
     }
 
+    const helpWindow = WebviewWindow.getByLabel("help");
+
+    if (helpWindow) {
+        helpWindow.close();
+    }
+
     await invoke("show_help_window");
 };
 
@@ -393,7 +399,7 @@ onUnmounted(() => {
         </button>
         <div id="drag-bar">
             <div style="display: flex; flex-grow: 1; justify-content: center" data-tauri-drag-region>
-                <span id="video-title">{{ videoTitle }} {{ x }}</span>
+                <span id="video-title">{{ videoTitle }}</span>
             </div>
             <div id="top-bar-right-buttons">
                 <Minus @click="() => getCurrent().minimize()" color="white" :size="20" />

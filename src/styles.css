@@ -7,10 +7,22 @@ main {
 body {
     margin: 0;
     overflow: hidden;
+    display: flex;
+    justify-content: stretch;
+    align-items: stretch;
 }
 
 #app {
     width: 100%;
+}
+
+h1,
+h2,
+h3,
+p,
+span {
+    font-family: "Inter", "Segoe UI", sans-serif;
+    color: white;
 }
 
 ::-webkit-scrollbar {

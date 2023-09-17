@@ -1,7 +1,5 @@
 import { createApp } from "vue";
-import "./css/help.css";
-import "./css/styles.css";
-import "./css/youtube.css";
+import "./styles.css";
 import App from "./App.vue";
 
 import { router } from "./router";

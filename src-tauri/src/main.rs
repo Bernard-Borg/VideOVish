@@ -13,6 +13,7 @@ async fn show_help_window(handle: tauri::AppHandle) {
     .skip_taskbar(true)
     .decorations(false)
     .transparent(true)
+    .always_on_top(true)
     .build()
     .unwrap();
 }
@@ -28,6 +29,7 @@ async fn show_youtube_modal(handle: tauri::AppHandle) {
     .min_inner_size(480.0, 200.0)
     .decorations(false)
     .transparent(true)
+    .always_on_top(true)
     .build()
     .unwrap();
 }

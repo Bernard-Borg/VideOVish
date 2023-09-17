@@ -86,3 +86,82 @@ onUnmounted(() => {
     window.removeEventListener("keydown", eventHandler);
 });
 </script>
+
+<style scoped>
+#main-div {
+    border-radius: 5px;
+    background-color: #252526;
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+#main-div > div {
+    padding: 20px 50px;
+}
+
+#info-div {
+    display: flex;
+    padding: 20px 50px 50px 50px !important;
+}
+
+.info-container {
+    padding: 0px 10px;
+}
+
+#header-div {
+    border-bottom: 1px solid rgb(30, 30, 30);
+    padding: 20px 0px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+h1,
+h2,
+h3,
+p,
+span,
+.key {
+    font-family: "Inter", "Segoe UI", sans-serif;
+    color: white;
+}
+
+h1 {
+    font-weight: lighter;
+}
+
+h3 {
+    font-size: 13px;
+}
+
+p {
+    margin-bottom: 35px;
+}
+
+.key {
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    width: 20px;
+    height: 10px;
+    background-color: rgb(22, 22, 22);
+    box-shadow: 0px 5px black;
+    margin-right: 10px;
+}
+
+span.key-symbol {
+    margin-top: 5px;
+    margin-right: 10px;
+}
+
+.key-container {
+    display: flex;
+}
+
+.control-key {
+    width: 40px;
+}
+</style>
