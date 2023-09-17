@@ -35,16 +35,23 @@ async fn show_youtube_modal(handle: tauri::AppHandle) {
 }
 
 #[tauri::command]
-async fn change_video_youtube(video_path: String, video_title: String) {
-    // mainWindow.webContents.send('youtube-video-path', `${videoPath}*${videoTitle}`);
-    // youtubeSelectorWindow.destroy();
+async fn download_video(video_path: String) {
+    // Search for video using ytd-dl binary
+    // Delete previous downloaded videos in youtube_downloads
+    // Download the video into youtube_downloads folder in AppData
+    // Download the video and set the name to a UUID
+    // If an error happens, emit error to youtube window
+    // If video download completes successfully, emit success to youtube window and video player
+
+    video_path
 }
 
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             show_help_window,
-            show_youtube_modal
+            show_youtube_modal,
+            download_video
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
