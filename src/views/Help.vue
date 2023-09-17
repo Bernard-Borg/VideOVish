@@ -60,13 +60,17 @@
 </template>
 
 <script setup lang="ts">
-import { WebviewWindow } from "@tauri-apps/api/window";
+import { WebviewWindow, getCurrent } from "@tauri-apps/api/window";
 import { X } from "lucide-vue-next";
 import { onMounted, onUnmounted } from "vue";
 
 const closeWindow = async () => {
     await WebviewWindow.getByLabel("help")?.close();
 };
+
+getCurrent().listen("tauri://blur", () => {
+    closeWindow();
+});
 
 const eventHandler = (e: KeyboardEvent) => {
     if (e.code === "Escape") {

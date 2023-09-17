@@ -8,7 +8,7 @@ import { exists } from "@tauri-apps/api/fs";
 import { basename, extname } from "@tauri-apps/api/path";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { getCurrent, appWindow, getAll } from "@tauri-apps/api/window";
-import { useMediaControls, useTimeoutFn } from "@vueuse/core";
+import { useMediaControls, useThrottleFn, useTimeoutFn } from "@vueuse/core";
 import {
     Info,
     Play,
@@ -19,7 +19,7 @@ import {
     Maximize,
     Minimize,
     Youtube,
-    Volume,
+    VolumeX,
     Volume1,
     Volume2,
     Minus,
@@ -46,6 +46,8 @@ const videoPlayer = ref<HTMLVideoElement | null>(null);
 const looping = ref<boolean>();
 const isFullscreen = ref<boolean>(false);
 const uiHidden = ref<boolean>(false);
+
+const volumeCache = ref<number>(0.5);
 
 const videoSrc = ref<string>("");
 const videoTitle = ref<string>();
@@ -96,7 +98,7 @@ const getVolumeIcon = (volume: number) => {
     let icon;
 
     if (volume == 0) {
-        icon = Volume;
+        icon = VolumeX;
     } else if (volume < 0.5) {
         icon = Volume1;
     } else {
@@ -119,6 +121,18 @@ const decreaseVolume = () => {
         volume.value = parseFloat((volume.value - 0.1).toFixed(1));
     }
 
+    displayTransformationAlert(getVolumeIcon(volume.value), `${parseFloat(volume.value.toFixed(1)) * 100}%`);
+};
+
+const mute = () => {
+    volumeCache.value = volume.value;
+
+    volume.value = 0;
+    displayTransformationAlert(getVolumeIcon(volume.value), `${parseFloat(volume.value.toFixed(1)) * 100}%`);
+};
+
+const unmute = () => {
+    volume.value = volumeCache.value;
     displayTransformationAlert(getVolumeIcon(volume.value), `${parseFloat(volume.value.toFixed(1)) * 100}%`);
 };
 
@@ -296,6 +310,14 @@ const mouseMoveHandler = () => {
     start();
 };
 
+const wheelHandler = useThrottleFn((e: WheelEvent) => {
+    if (e.deltaY < 0) {
+        increaseVolume();
+    } else {
+        decreaseVolume();
+    }
+}, 125);
+
 onBeforeMount(async () => {
     let videoPath: string = "";
 
@@ -329,12 +351,14 @@ onMounted(() => {
     window.addEventListener("keydown", keyDownEventHandler);
     window.addEventListener("keyup", keyUpEventHandler);
     window.addEventListener("mousemove", mouseMoveHandler);
+    window.addEventListener("wheel", wheelHandler);
 });
 
 onUnmounted(() => {
     window.removeEventListener("keydown", keyDownEventHandler);
     window.removeEventListener("keyup", keyUpEventHandler);
     window.removeEventListener("mousemove", mouseMoveHandler);
+    window.addEventListener("wheel", wheelHandler);
 });
 </script>
 
@@ -352,7 +376,7 @@ onUnmounted(() => {
         </button>
         <div id="drag-bar" style="display: flex">
             <div style="display: flex; flex-grow: 1; justify-content: center" data-tauri-drag-region>
-                <span id="video-title" style="pointer-events: none">{{ videoTitle }}</span>
+                <span id="video-title" style="pointer-events: none; user-select: none">{{ videoTitle }}</span>
             </div>
             <div
                 style="
@@ -370,7 +394,7 @@ onUnmounted(() => {
             </div>
         </div>
     </div>
-    <span id="playspeed-indicator">{{ rate.toFixed(2) }}</span>
+    <span id="playspeed-indicator" style="user-select: none">{{ rate.toFixed(2) }}</span>
     <Transition name="fade">
         <div id="transformation-alert" v-if="transformationIcon">
             <div id="transformation-icon"><component :is="transformationIcon" color="white" /></div>
@@ -400,36 +424,51 @@ onUnmounted(() => {
         id="video-controls"
         :style="{
             display: uiHidden ? 'none' : 'flex',
+            justifyContent: 'space-between',
+            paddingLeft: '16px',
+            paddingRight: '16px',
             background: uiHidden ? 'transparent' : 'linear-gradient(transparent, black)'
         }"
     >
-        <button id="loop-button" @click="setLoopMode">
-            <div class="svg-container">
-                <Repeat :color="looping ? 'limegreen' : 'white'" />
-            </div>
-        </button>
-        <button id="rewind-button" @click="() => rewindVideo(5)">
-            <div class="svg-container">
-                <Rewind color="white" />
-            </div>
-        </button>
-        <button id="play-button" @click="playVideo">
-            <div class="svg-container">
-                <Play v-if="!playing" color="white" />
-                <Pause v-else color="white" />
-            </div>
-        </button>
-        <button id="forward-button" @click="() => forwardVideo(5)">
-            <div class="svg-container">
-                <FastForward color="white" />
-            </div>
-        </button>
-        <button id="maximise-button" @click="() => setFullscreen()">
-            <div class="svg-container">
-                <Minimize color="white" v-if="isFullscreen" />
-                <Maximize color="white" v-else />
-            </div>
-        </button>
+        <div>
+            <button id="loop-button" @click="setLoopMode">
+                <div class="svg-container">
+                    <Repeat :color="looping ? 'limegreen' : 'white'" />
+                </div>
+            </button>
+            <button id="volume-button" @click="volume ? mute : unmute">
+                <div class="svg-container">
+                    <VolumeX v-if="!volume" color="white" />
+                    <Volume2 v-else color="white" />
+                </div>
+            </button>
+        </div>
+        <div>
+            <button id="rewind-button" @click="() => rewindVideo(5)">
+                <div class="svg-container">
+                    <Rewind color="white" />
+                </div>
+            </button>
+            <button id="play-button" @click="playVideo">
+                <div class="svg-container">
+                    <Play v-if="!playing" color="white" />
+                    <Pause v-else color="white" />
+                </div>
+            </button>
+            <button id="forward-button" @click="() => forwardVideo(5)">
+                <div class="svg-container">
+                    <FastForward color="white" />
+                </div>
+            </button>
+        </div>
+        <div>
+            <button id="maximise-button" @click="() => setFullscreen()">
+                <div class="svg-container">
+                    <Minimize color="white" v-if="isFullscreen" />
+                    <Maximize color="white" v-else />
+                </div>
+            </button>
+        </div>
     </div>
 </template>
 

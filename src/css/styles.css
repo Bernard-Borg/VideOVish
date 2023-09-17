@@ -74,7 +74,7 @@ body {
     bottom: 0px;
     left: 0px;
     background: linear-gradient(transparent, black);
-    width: 100%;
+    width: calc(100% - 32px);
     justify-content: center;
     align-items: center;
 }
@@ -84,7 +84,7 @@ video {
     width: 100%;
 }
 
-#video-controls > button,
+#video-controls button,
 #top-bar > button {
     width: 75px;
     height: 75px;
@@ -98,16 +98,6 @@ video {
     width: 30px;
     height: 30px;
     padding: 5px;
-}
-
-#maximise-button {
-    position: absolute;
-    right: 2.5%;
-}
-
-#loop-button {
-    position: absolute;
-    left: 2.5%;
 }
 
 .svg-container {
