@@ -345,7 +345,8 @@ onBeforeMount(async () => {
     let videoPath: string = "";
 
     // Handles the ipcRenderer event emitted when the user picks a youtube video
-    listen("youtube-video-path", (event) => {
+    listen("video-downloaded", (event) => {
+        console.log(event.payload);
         const [videoPath, ...rest] = (event.payload as { data: string }).data.split("*");
         const videoTitle = rest.join("*");
 
