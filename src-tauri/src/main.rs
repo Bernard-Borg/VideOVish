@@ -35,15 +35,13 @@ async fn show_youtube_modal(handle: tauri::AppHandle) {
 }
 
 #[tauri::command]
-async fn download_video(video_path: String) {
+async fn download_video(_video_path: String) {
     // Search for video using ytd-dl binary
     // Delete previous downloaded videos in youtube_downloads
     // Download the video into youtube_downloads folder in AppData
     // Download the video and set the name to a UUID
     // If an error happens, emit error to youtube window
     // If video download completes successfully, emit success to youtube window and video player
-
-    video_path
 }
 
 fn main() {

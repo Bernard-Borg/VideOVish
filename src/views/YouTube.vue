@@ -48,9 +48,13 @@ const animateLoadingText = () => {
     }
 };
 
-const { pause, resume } = useIntervalFn(() => {
-    animateLoadingText();
-}, 250);
+const { pause, resume } = useIntervalFn(
+    () => {
+        animateLoadingText();
+    },
+    250,
+    { immediate: false }
+);
 
 const keyUpEventHandler = async (event: KeyboardEvent) => {
     if (event.code === "Escape") {
