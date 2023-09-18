@@ -21,6 +21,7 @@
             <option :value="4">240p</option>
             <option :value="5">Audio only</option>
         </select>
+        <button>Clear cache</button>
         <span id="time-notice" v-if="loadingText">This will take a while</span>
         <span id="loading-text" v-if="loadingText">{{ loadingText }}</span>
     </div>
