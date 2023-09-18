@@ -13,9 +13,17 @@
     "tauri": {
         "allowlist": {
             "all": true,
+            "fs": {
+                "all": true,
+                "scope": ["$APPDATA", "$APPDATA/*", "$APPDATA/youtube-downloads/*"]
+            },
             "shell": {
                 "all": false,
                 "open": true
+            },
+            "protocol": {
+                "asset": true,
+                "assetScope": ["**"]
             }
         },
         "bundle": {

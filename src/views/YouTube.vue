@@ -1,8 +1,9 @@
 <template>
-    <div id="main-div">
-        <h1 style="font-weight: 600">Search video</h1>
+    <div id="main-div" data-tauri-drag-region>
+        <h1 style="font-weight: 600; margin-bottom: 0">Search video</h1>
         <X color="white" style="position: absolute; top: 10px; right: 10px" @click="closeWindow" />
-        <div style="display: flex; align-items: center">
+        <span v-if="failureReason" style="color: red">{{ failureReason }}</span>
+        <div style="display: flex; align-items: center; margin-top: 30px">
             <input
                 v-model="search"
                 id="youtube-search"
@@ -12,22 +13,31 @@
             />
             <Search @click="downloadVideo" color="#252526" style="margin-left: -40px; cursor: pointer; z-index: 99" />
         </div>
+        <span>Preferred Quality</span>
+        <select v-model="preferredQuality">
+            <option :value="1" selected>1080p</option>
+            <option :value="2">720p</option>
+            <option :value="3">480p</option>
+            <option :value="4">240p</option>
+            <option :value="5">Audio only</option>
+        </select>
         <span id="time-notice" v-if="loadingText">This will take a while</span>
         <span id="loading-text" v-if="loadingText">{{ loadingText }}</span>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted, onMounted } from "vue";
+import { ref, onUnmounted, onMounted, watch } from "vue";
 import { invoke } from "@tauri-apps/api";
 import { WebviewWindow, getCurrent } from "@tauri-apps/api/window";
-import { listen } from "@tauri-apps/api/event";
 import { useIntervalFn, useOnline } from "@vueuse/core";
 import { X, Search } from "lucide-vue-next";
 
 const search = ref<string>("");
 const loadingText = ref<string>("");
 const searchFailed = ref<boolean>(false);
+const failureReason = ref<string>("");
+const preferredQuality = ref<string>("");
 
 const online = useOnline();
 
@@ -36,7 +46,9 @@ const closeWindow = async () => {
 };
 
 getCurrent().listen("tauri://blur", () => {
-    closeWindow();
+    if (!loadingText.value) {
+        closeWindow();
+    }
 });
 
 // Loading... animation
@@ -68,6 +80,7 @@ const keyUpEventHandler = async (event: KeyboardEvent) => {
 
 const downloadVideo = async () => {
     searchFailed.value = false;
+    failureReason.value = "";
 
     // Prevents user from clicking enter multiple times
     if (loadingText.value) {
@@ -76,21 +89,34 @@ const downloadVideo = async () => {
 
     // Cannot download video if offline
     if (!online.value) {
+        searchFailed.value = true;
+        failureReason.value = "Cannot play YouTube video while offline";
         return;
     }
 
-    invoke("download_video", { url: search.value });
-    resume();
+    const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    const match = search.value.match(regExp);
+    const hasMatched = match && match[7].length === 11 ? match[7] : false;
 
-    const unlisten = await listen("search_failed", (event) => {
-        const error = (event.payload as { errorMessage: string }).errorMessage;
-        console.log(error);
-        pause();
-
+    if (!hasMatched) {
         searchFailed.value = true;
-    });
+        failureReason.value = "Not a YouTube URL";
+        return;
+    }
 
-    unlisten();
+    resume();
+    invoke("download_video", { url: search.value, code: hasMatched, quality: preferredQuality.value ?? 1 }).then(
+        (result) => {
+            if (result === "") {
+                closeWindow(); //if download was successful, close window
+            } else {
+                // if download wasn't, display error
+                pause();
+                searchFailed.value = true;
+                failureReason.value = result as string;
+            }
+        }
+    );
 };
 
 const getVideo = (event: KeyboardEvent) => {
@@ -98,6 +124,11 @@ const getVideo = (event: KeyboardEvent) => {
         downloadVideo();
     }
 };
+
+watch(search, () => {
+    searchFailed.value = false;
+    failureReason.value = "";
+});
 
 // Window setup and main logic
 onMounted(async () => {
