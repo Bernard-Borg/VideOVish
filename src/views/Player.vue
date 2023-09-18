@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeMount, onMounted, onUnmounted, ref, computed } from "vue";
+import { onBeforeMount, onMounted, onUnmounted, ref, computed, watch } from "vue";
 import { invoke } from "@tauri-apps/api";
 import { getMatches } from "@tauri-apps/api/cli";
 import { open } from "@tauri-apps/api/dialog";
@@ -27,6 +27,8 @@ import {
     X
 } from "lucide-vue-next";
 import type { Icon } from "lucide-vue-next";
+import { HardDrive } from "lucide-vue-next";
+import { History } from "lucide-vue-next";
 
 const NUM_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 const PLAYBACK_SPEEDS = [0.07, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 5, 7.5, 10, 12, 14, 16];
@@ -52,6 +54,7 @@ const volumeCache = ref<number>(0.5);
 
 const videoSrc = ref<string>("");
 const videoTitle = ref<string>();
+const videoChooser = ref<boolean>(false);
 
 const transformationIcon = ref<Icon>();
 const transformationText = ref<string>();
@@ -228,6 +231,9 @@ const setVideoSource = async (filepath: string, title?: string) => {
         title = title.replace(`.${extension}`, "");
     }
 
+    localStorage.setItem("last-video", `${filepath}`);
+    videoChooser.value = false;
+
     filepath = convertFileSrc(filepath);
 
     videoTitle.value = title;
@@ -341,16 +347,30 @@ const wheelHandler = useThrottleFn((e: WheelEvent) => {
     }
 }, 125);
 
+const continueFromPrevious = () => {
+    const previousVideo = localStorage.getItem("last-video");
+
+    if (previousVideo) {
+        setVideoSource(previousVideo);
+    } else {
+        showVideoDialog();
+    }
+};
+
 onBeforeMount(async () => {
     let videoPath: string = "";
 
-    // Handles the ipcRenderer event emitted when the user picks a youtube video
-    listen("video-downloaded", (event) => {
-        console.log(event.payload);
-        const [videoPath, ...rest] = (event.payload as { data: string }).data.split("*");
-        const videoTitle = rest.join("*");
+    // Handles the IPC event emitted when the user picks a youtube video
+    listen("video-downloaded", async (event) => {
+        debugger;
 
-        setVideoSource(videoPath, videoTitle);
+        const payload = event.payload as { path: string; code: string };
+
+        const temp = await basename(payload.path);
+        const index = temp.indexOf(`[${payload.code}]`);
+        const title = temp.substring(0, index - 1);
+
+        setVideoSource(payload.path, title);
     });
 
     await getMatches().then((matches) => {
@@ -363,12 +383,15 @@ onBeforeMount(async () => {
         // Sets the video if the user does Open With or calls the program with a CLI path, otherwise shows the file dialog
         if (VALID_EXTENSIONS.includes(await extension.toLowerCase().substring(1, extension.toLowerCase().length))) {
             setVideoSource(videoPath);
-        } else {
-            await showVideoDialog();
+            return;
         }
-    } else {
-        await showVideoDialog();
     }
+
+    videoChooser.value = true;
+});
+
+watch(volume, (newValue) => {
+    localStorage.setItem("last-volume", `${newValue}`);
 });
 
 onMounted(() => {
@@ -376,6 +399,12 @@ onMounted(() => {
     window.addEventListener("keyup", keyUpEventHandler);
     window.addEventListener("mousemove", mouseMoveHandler);
     window.addEventListener("wheel", wheelHandler);
+
+    const lastVolume = localStorage.getItem("last-volume");
+
+    if (lastVolume && !isNaN(parseFloat(lastVolume))) {
+        volume.value = parseFloat(lastVolume);
+    }
 });
 
 onUnmounted(() => {
@@ -387,6 +416,27 @@ onUnmounted(() => {
 </script>
 
 <template>
+    <div
+        v-if="videoChooser"
+        style="
+            display: flex;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0);
+            z-index: 9999;
+        "
+    >
+        <div
+            id="video-chooser"
+            style="background: #252526; padding: 50px; display: flex; gap: 50px; border-radius: 5px"
+        >
+            <button @click="showVideoDialog"><HardDrive :size="40" color="white" /> Local</button>
+            <button><Youtube :size="40" fill="red" @click="showYoutubeModal" /> Youtube</button>
+            <button @click="continueFromPrevious"><History :size="40" color="white" /> Previous</button>
+        </div>
+    </div>
     <div id="top-bar" v-if="!isFullscreen">
         <button id="help-button" @click="showHelpWindow">
             <div class="svg-container svg-container-top">
@@ -499,6 +549,17 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+#video-chooser > button {
+    aspect-ratio: 1 / 1;
+    width: 100px;
+    font-size: 20px;
+    border: 1px solid black;
+    border-radius: 5px;
+    font-family: "Inter", sans-serif;
+    background: #555557;
+    color: white;
+}
+
 #video-controls div {
     flex-grow: 1;
     flex-basis: 0;
