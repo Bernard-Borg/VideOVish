@@ -334,6 +334,11 @@ const keyUpEventHandler = (event: KeyboardEvent) => {
 };
 
 const mouseMoveHandler = () => {
+    if (videoChooser.value) {
+        uiHidden.value = true;
+        return;
+    }
+
     stop();
     uiHidden.value = false;
     start();
@@ -434,7 +439,7 @@ onUnmounted(() => {
 
 <template>
     <!-- Video chooser -->
-    <div v-if="videoChooser" class="flex w-full h-full justify-center items-center bg-transparent">
+    <div v-if="videoChooser" class="flex flex-col w-full h-full justify-center items-center bg-transparent">
         <div class="bg-charcoal p-[50px] flex gap-10 rounded-md outline-white outline-1 outline">
             <button
                 class="flex flex-col justify-center items-center aspect-square w-[100px] text-md font-sans rounded-md bg-gray-600 text-white"
@@ -455,6 +460,12 @@ onUnmounted(() => {
                 <History :size="40" color="white" /> Previous
             </button>
         </div>
+        <button
+            class="bg-charcoal outline outline-1 outline-white text-white mt-4 w-24 p-2 rounded-md"
+            @click="() => getCurrent().close()"
+        >
+            Quit
+        </button>
     </div>
     <!-- Top bar -->
     <div class="bg-charcoal min-h-[30px] flex gap-1" v-if="!isFullscreen">
