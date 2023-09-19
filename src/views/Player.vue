@@ -471,7 +471,7 @@ onUnmounted(() => {
     <div class="bg-charcoal min-h-[30px] flex gap-1" v-if="!isFullscreen">
         <button @click="showHelpWindow" class="aspect-square w-[30px] p-1">
             <div class="flex items-center justify-center">
-                <Info color="white" />
+                <Info color="white" fill="#1958b7" />
             </div>
         </button>
         <button ref="youtubeButton" @click="showYoutubeModal">

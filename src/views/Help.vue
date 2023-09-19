@@ -1,59 +1,58 @@
 <template>
-    <div id="main-div">
-        <div id="header-div">
-            <h1>Keyboard Shortcuts</h1>
+    <div class="rounded-sm bg-charcoal w-full h-full overflow-y-scroll">
+        <div
+            class="flex items-center justify-between px-8 py-4 border-b border-solid"
+            data-tauri-drag-region
+            style="border-color: rgb(30, 30, 30)"
+        >
+            <h1 class="text-3xl my-2 font-semibold">Keyboard Shortcuts</h1>
             <X color="white" @click="closeWindow" />
         </div>
-        <div id="info-div">
-            <div class="info-container">
-                <h2>Video Playback</h2>
-                <p>These shortcuts have to do with playing the video.</p>
-                <h3>PLAY/PAUSE</h3>
-                <div class="key control-key">SPACE</div>
-                <h3>SLOW DOWN VIDEO</h3>
-                <div class="key">S</div>
-                <h3>SPEED UP VIDEO</h3>
-                <div class="key">D</div>
-                <h3>REWIND 5 SECONDS</h3>
-                <div class="key">←</div>
-                <h3>FAST FORWARD 5 SECONDS</h3>
-                <div class="key">→</div>
-                <h3>REWIND 10 SECONDS</h3>
-                <div class="key">J</div>
-                <h3>FAST FORWARD 10 SECONDS</h3>
-                <div class="key">K</div>
-                <h3>INCREASE VOLUME</h3>
-                <div class="key">↑</div>
-                <h3>DECREASE VOLUME</h3>
-                <div class="key">↓</div>
-                <h3>SEEK LOCATION</h3>
-                <div class="key-container">
-                    <div class="key">0</div>
-                    <span class="key-symbol">-</span>
-                    <div class="key">9</div>
-                </div>
+        <div class="flex gap-16 px-12 py-8 justify-evenly">
+            <div class="w-full">
+                <h2 class="text-2xl !font-semibold">Video Playback</h2>
+                <span class="text-sm inline-block mb-7">These shortcuts have to do with playing the video.</span>
+                <span class="block mb-3">PLAY/PAUSE <HelpKey extendWidth class="float-right">SPACE</HelpKey></span>
+                <span class="block mb-3">SLOW DOWN VIDEO <HelpKey class="float-right">S</HelpKey></span>
+                <span class="block mb-3">SPEED UP VIDEO <HelpKey class="float-right">D</HelpKey></span>
+                <span class="block mb-3">REWIND 5 SECONDS <HelpKey class="float-right">←</HelpKey></span>
+                <span class="block mb-3">FAST FORWARD 5 SECONDS <HelpKey class="float-right">→</HelpKey></span>
+                <span class="block mb-3">REWIND 10 SECONDS <HelpKey class="float-right">J</HelpKey></span>
+                <span class="block mb-3">FAST FORWARD 10 SECONDS <HelpKey class="float-right">K</HelpKey></span>
+                <span class="block mb-3">INCREASE VOLUME <HelpKey class="float-right">↑</HelpKey></span>
+                <span class="block mb-3">DECREASE VOLUME <HelpKey class="float-right">↓</HelpKey></span>
+                <span class="block mb-3">
+                    SEEK LOCATION
+                    <span class="float-right">
+                        <HelpKey>0</HelpKey>
+                        <span class="key-symbol">-</span>
+                        <HelpKey>9</HelpKey>
+                    </span>
+                </span>
             </div>
-            <div class="info-container">
-                <h2>App Management</h2>
-                <p>These shortcuts have to do with managing the app itself.</p>
-                <h3>HELP MENU</h3>
-                <div class="key-container">
-                    <div class="key">F1</div>
-                    <span class="key-symbol">/</span>
-                    <div class="control-key key">CTRL</div>
-                    <span class="key-symbol">+</span>
-                    <div class="key">/</div>
-                </div>
-                <h3>TOGGLE FULLSCREEN</h3>
-                <div class="key">F11</div>
-                <h3>PICK VIDEO TO VIEW</h3>
-                <div class="key-container">
-                    <div class="key control-key">CTRL</div>
-                    <span class="key-symbol">+</span>
-                    <div class="key">O</div>
-                </div>
-                <h3>CLOSE SECONDARY WINDOW</h3>
-                <div class="key">ESC</div>
+            <div class="w-full">
+                <h2 class="text-2xl !font-semibold">App Management</h2>
+                <span class="text-sm inline-block mb-7">These shortcuts have to do with managing the app itself.</span>
+                <span class="block mb-3">
+                    HELP MENU
+                    <span class="float-right">
+                        <HelpKey>F1</HelpKey>
+                        <span class="key-symbol">/</span>
+                        <HelpKey extendWidth>CTRL</HelpKey>
+                        <span class="key-symbol">+</span>
+                        <HelpKey>/</HelpKey>
+                    </span>
+                </span>
+                <span class="block mb-3">TOGGLE FULLSCREEN <HelpKey class="float-right">F11</HelpKey></span>
+                <span class="block mb-3">
+                    PICK VIDEO TO VIEW
+                    <span class="float-right">
+                        <HelpKey extendWidth>CTRL</HelpKey>
+                        <span class="key-symbol">+</span>
+                        <HelpKey>O</HelpKey>
+                    </span>
+                </span>
+                <span class="block mb-3">CLOSE SECONDARY WINDOW <HelpKey class="float-right">ESC</HelpKey></span>
             </div>
         </div>
     </div>
@@ -63,6 +62,7 @@
 import { WebviewWindow, getCurrent } from "@tauri-apps/api/window";
 import { X } from "lucide-vue-next";
 import { onMounted, onUnmounted } from "vue";
+import HelpKey from "../components/HelpKey.vue";
 
 const closeWindow = async () => {
     await WebviewWindow.getByLabel("help")?.close();
@@ -88,80 +88,8 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-#main-div {
-    border-radius: 5px;
-    background-color: #252526;
-    width: 100%;
-    height: 100%;
-    overflow-y: scroll;
-}
-
-#main-div > div {
-    padding: 20px 50px;
-}
-
-#info-div {
-    display: flex;
-    padding: 20px 50px 50px 50px !important;
-}
-
-.info-container {
-    padding: 0px 10px;
-}
-
-#header-div {
-    border-bottom: 1px solid rgb(30, 30, 30);
-    padding: 20px 0px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-h1,
-h2,
-h3,
-p,
-span,
-.key {
-    font-family: "Inter", "Segoe UI", sans-serif;
-    color: white;
-}
-
-h1 {
-    font-weight: lighter;
-}
-
-h3 {
-    font-size: 13px;
-}
-
-p {
-    margin-bottom: 35px;
-}
-
-.key {
-    border-radius: 5px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-    width: 20px;
-    height: 10px;
-    background-color: rgb(22, 22, 22);
-    box-shadow: 0px 5px black;
-    margin-right: 10px;
-}
-
 span.key-symbol {
     margin-top: 5px;
     margin-right: 10px;
-}
-
-.key-container {
-    display: flex;
-}
-
-.control-key {
-    width: 40px;
 }
 </style>
