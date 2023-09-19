@@ -18,7 +18,7 @@ async fn show_help_window(handle: tauri::AppHandle) {
         "help", /* the unique window label */
         tauri::WindowUrl::App("help".into()),
     )
-    .inner_size(1024.0, 768.0)
+    .inner_size(1024.0, 600.0)
     .min_inner_size(480.0, 480.0)
     .skip_taskbar(true)
     .decorations(false)
@@ -103,7 +103,7 @@ async fn download_video(handle: tauri::AppHandle, url: String, code: String) -> 
         return "".to_string();
     }
 
-    let (mut rx, mut child) = Command::new_sidecar("yt-dlp")
+    let (mut rx, mut _child) = Command::new_sidecar("yt-dlp")
         .expect("Failed to create yt-dlp binary command")
         .args([
             url,
@@ -111,8 +111,8 @@ async fn download_video(handle: tauri::AppHandle, url: String, code: String) -> 
             downloads_folder.display().to_string(),
             "--extractor-args".to_string(),
             "youtube:skip=hls,dash;youtube:skip=translated_subs".to_string(),
-            "-f".to_string(),
-            "137+251".to_string(),
+            // "-f".to_string(),
+            // "137+251".to_string(),
             "--print".to_string(),
             "after_move:filepath".to_string(),
             "--no-simulate".to_string(),
