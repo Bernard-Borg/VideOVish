@@ -1,44 +1,16 @@
-<template>
-    <div id="main-div" data-tauri-drag-region>
-        <h1 style="font-weight: 600; margin-bottom: 0">Search video</h1>
-        <X color="white" style="position: absolute; top: 10px; right: 10px" @click="closeWindow" />
-        <span v-if="failureReason" style="color: red">{{ failureReason }}</span>
-        <div style="display: flex; align-items: center; margin-top: 30px">
-            <input
-                v-model="search"
-                id="youtube-search"
-                ref="youtubeSearch"
-                placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                @keyup="getVideo"
-            />
-            <Search @click="downloadVideo" color="#252526" style="margin-left: -40px; cursor: pointer; z-index: 99" />
-        </div>
-        <span>Preferred Quality</span>
-        <select v-model="preferredQuality">
-            <option :value="1" selected>1080p</option>
-            <option :value="2">720p</option>
-            <option :value="3">480p</option>
-            <option :value="4">240p</option>
-            <option :value="5">Audio only</option>
-        </select>
-        <button>Clear cache</button>
-        <span id="time-notice" v-if="loadingText">This will take a while</span>
-        <span id="loading-text" v-if="loadingText">{{ loadingText }}</span>
-    </div>
-</template>
-
 <script setup lang="ts">
 import { ref, onUnmounted, onMounted, watch } from "vue";
 import { invoke } from "@tauri-apps/api";
 import { WebviewWindow, getCurrent } from "@tauri-apps/api/window";
 import { useIntervalFn, useOnline } from "@vueuse/core";
 import { X, Search } from "lucide-vue-next";
+import { Trash2 } from "lucide-vue-next";
 
 const search = ref<string>("");
 const loadingText = ref<string>("");
 const searchFailed = ref<boolean>(false);
 const failureReason = ref<string>("");
-const preferredQuality = ref<string>("");
+const preferredQuality = ref<number>(1);
 
 const online = useOnline();
 
@@ -141,35 +113,51 @@ onUnmounted(() => {
     document.removeEventListener("keyup", keyUpEventHandler);
     pause();
 });
+
+const clearCache = async () => {
+    await invoke("clear_cache");
+};
 </script>
 
-<style scoped>
-#main-div {
-    border-radius: 5px;
-    background-color: #252526;
-    width: 100%;
-    padding: 40px 50px;
-    height: 100%;
-}
-
-input {
-    border-radius: 7px;
-    padding: 15px;
-    width: 400px;
-    font-family: "Inter", "Segoe UI", sans-serif;
-}
-
-#loading-text {
-    position: absolute;
-    padding: 10px;
-    right: 0;
-    bottom: 0;
-}
-
-#time-notice {
-    visibility: hidden;
-    position: absolute;
-    left: 10px;
-    bottom: 10px;
-}
-</style>
+<template>
+    <div class="rounded-md bg-charcoal w-full h-full px-12 py-10" data-tauri-drag-region>
+        <h1 class="font-bold text-3xl">Search video</h1>
+        <X color="white" class="absolute top-[10px] right-[10px]" @click="closeWindow" />
+        <!-- Quality select -->
+        <div class="flex items-center mt-4 justify-end w-[500px]">
+            <span class="inline-block mr-3">Preferred Quality</span>
+            <select v-model="preferredQuality" class="cursor-pointer">
+                <option :value="1" selected>1080p</option>
+                <option :value="2">720p</option>
+                <option :value="3">480p</option>
+                <option :value="4">240p</option>
+                <option :value="5">Audio only</option>
+            </select>
+        </div>
+        <!-- Search bar -->
+        <div class="flex flex-col w-[500px] mt-3">
+            <div class="flex items-center">
+                <input
+                    v-model="search"
+                    ref="youtubeSearch"
+                    :class="`rounded-md p-[15px] w-full text-md ${
+                        failureReason ? 'outline outline-1 outline-red-600' : ''
+                    }`"
+                    placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    @keydown.tab="search = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
+                    @keyup="getVideo"
+                />
+                <Search @click="downloadVideo" color="#252526" class="-ml-[40px] cursor-pointer z-50" />
+            </div>
+            <span class="text-red-600 text-sm self-end">{{ failureReason }}</span>
+        </div>
+        <button
+            class="outline outline-1 outline-white text-white p-1 rounded-md absolute bottom-[10px] right-[10px] hover:bg-red-500"
+            title="Clear Cache"
+            @click="clearCache"
+        >
+            <Trash2 />
+        </button>
+        <span class="absolute left-0 bottom-0 p-3" v-if="loadingText">{{ loadingText }}</span>
+    </div>
+</template>
