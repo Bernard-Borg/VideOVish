@@ -74,6 +74,7 @@ async fn download_video(handle: tauri::AppHandle, url: String, code: String) -> 
     {
         match entry {
             Ok(path) => {
+                println!("Hi from rust");
                 vid_path = path.display().to_string();
 
                 break;
@@ -110,8 +111,8 @@ async fn download_video(handle: tauri::AppHandle, url: String, code: String) -> 
             downloads_folder.display().to_string(),
             "--extractor-args".to_string(),
             "youtube:skip=hls,dash;youtube:skip=translated_subs".to_string(),
-            // "-f".to_string(),
-            // "137+251".to_string(),
+            "-f".to_string(),
+            "137+251".to_string(),
             "--print".to_string(),
             "after_move:filepath".to_string(),
             "--no-simulate".to_string(),

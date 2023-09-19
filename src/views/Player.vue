@@ -24,11 +24,11 @@ import {
     Volume2,
     Minus,
     Square,
-    X
+    X,
+    HardDrive,
+    History
 } from "lucide-vue-next";
 import type { Icon } from "lucide-vue-next";
-import { HardDrive } from "lucide-vue-next";
-import { History } from "lucide-vue-next";
 
 const NUM_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 const PLAYBACK_SPEEDS = [0.07, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 5, 7.5, 10, 12, 14, 16];
@@ -347,8 +347,23 @@ const wheelHandler = useThrottleFn((e: WheelEvent) => {
     }
 }, 125);
 
+const showVideoChooser = () => {
+    if (playing.value) {
+        playVideo();
+    }
+
+    videoChooser.value = true;
+};
+
 const continueFromPrevious = () => {
     const previousVideo = localStorage.getItem("last-video");
+    const previousTime = localStorage.getItem("last-time");
+
+    if (previousTime) {
+        currentTime.value = parseFloat(previousTime);
+    } else {
+        currentTime.value = 0;
+    }
 
     if (previousVideo) {
         setVideoSource(previousVideo);
@@ -362,8 +377,6 @@ onBeforeMount(async () => {
 
     // Handles the IPC event emitted when the user picks a youtube video
     listen("video-downloaded", async (event) => {
-        debugger;
-
         const payload = event.payload as { path: string; code: string };
 
         const temp = await basename(payload.path);
@@ -387,11 +400,15 @@ onBeforeMount(async () => {
         }
     }
 
-    videoChooser.value = true;
+    showVideoChooser();
 });
 
 watch(volume, (newValue) => {
     localStorage.setItem("last-volume", `${newValue}`);
+});
+
+watch(currentTime, (newValue) => {
+    localStorage.setItem("last-time", `${newValue}`);
 });
 
 onMounted(() => {
@@ -416,62 +433,79 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div
-        v-if="videoChooser"
-        style="
-            display: flex;
-            width: 100%;
-            height: 100%;
-            justify-content: center;
-            align-items: center;
-            background-color: rgba(0, 0, 0, 0);
-            z-index: 9999;
-        "
-    >
-        <div
-            id="video-chooser"
-            style="background: #252526; padding: 50px; display: flex; gap: 50px; border-radius: 5px"
-        >
-            <button @click="showVideoDialog"><HardDrive :size="40" color="white" /> Local</button>
-            <button><Youtube :size="40" fill="red" @click="showYoutubeModal" /> Youtube</button>
-            <button @click="continueFromPrevious"><History :size="40" color="white" /> Previous</button>
+    <!-- Video chooser -->
+    <div v-if="videoChooser" class="flex w-full h-full justify-center items-center bg-transparent">
+        <div class="bg-charcoal p-[50px] flex gap-10 rounded-md outline-white outline-1 outline">
+            <button
+                class="flex flex-col justify-center items-center aspect-square w-[100px] text-md font-sans rounded-md bg-gray-600 text-white"
+                @click="showVideoDialog"
+            >
+                <HardDrive :size="40" color="white" /> Local
+            </button>
+            <button
+                class="flex flex-col justify-center items-center aspect-square w-[100px] text-md font-sans rounded-md bg-gray-600 text-white"
+                @click="showYoutubeModal"
+            >
+                <Youtube :size="40" fill="red" /> Youtube
+            </button>
+            <button
+                class="flex flex-col justify-center items-center aspect-square w-[100px] text-md font-sans rounded-md bg-gray-600 text-white"
+                @click="continueFromPrevious"
+            >
+                <History :size="40" color="white" /> Previous
+            </button>
         </div>
     </div>
-    <div id="top-bar" v-if="!isFullscreen">
-        <button id="help-button" @click="showHelpWindow">
-            <div class="svg-container svg-container-top">
+    <!-- Top bar -->
+    <div class="bg-charcoal min-h-[30px] flex gap-1" v-if="!isFullscreen">
+        <button @click="showHelpWindow" class="aspect-square w-[30px] p-1">
+            <div class="flex items-center justify-center">
                 <Info color="white" />
             </div>
         </button>
-        <button ref="youtubeButton" id="youtube-button" @click="showYoutubeModal">
-            <div class="svg-container svg-container-top">
+        <button ref="youtubeButton" @click="showYoutubeModal">
+            <div class="flex items-center justify-center">
                 <Youtube fill="red" color="white" />
             </div>
         </button>
-        <div id="drag-bar">
-            <div style="display: flex; flex-grow: 1; justify-content: center" data-tauri-drag-region>
-                <span id="video-title">{{ videoTitle }}</span>
+        <div class="w-full flex justify-center items-center text-white">
+            <div class="flex flex-grow justify-center" data-tauri-drag-region>
+                <span
+                    class="select-none cursor-pointer p-1 px-2 outline outline-1 rounded-md m-1 text-sm bg-black"
+                    @click="showVideoChooser"
+                >
+                    {{ videoTitle ?? "Change Video" }}
+                </span>
             </div>
-            <div id="top-bar-right-buttons">
+            <div class="float-right flex items-center justify-around flex-grow-0 w-[100px]">
                 <Minus @click="() => getCurrent().minimize()" color="white" :size="20" />
                 <Square @click="() => getCurrent().maximize()" color="white" :size="20" />
                 <X @click="() => getCurrent().close()" color="white" :size="20" />
             </div>
         </div>
     </div>
-    <span id="playspeed-indicator" style="user-select: none">{{ rate.toFixed(2) }}</span>
+    <!-- Plaayback rate -->
+    <span v-if="!uiHidden" :class="`select-none absolute ${isFullscreen ? 'top-0' : 'top-[30px]'}`">{{
+        rate.toFixed(2)
+    }}</span>
+    <!-- Transformation alert -->
     <Transition name="fade">
-        <div id="transformation-alert" v-if="transformationIcon">
-            <div id="transformation-icon"><component :is="transformationIcon" color="white" /></div>
-            <span id="transformation-text">{{ transformationText }}</span>
+        <div
+            v-if="transformationIcon"
+            class="rounded-full bg-black outline outline-1 outline-white bg-opacity-50 flex flex-col justify-evenly items-center absolute m-4 right-0 aspect-square w-[100px]"
+        >
+            <div class="w-5"><component :is="transformationIcon" color="white" /></div>
+            <span v-if="transformationText" class="text-white">{{ transformationText }}</span>
         </div>
     </Transition>
-    <div id="main-video" @click="playVideo">
-        <video ref="videoPlayer" id="video-player"></video>
+    <!-- Video player -->
+    <div @click="playVideo" class="bg-black max-h-full h-full">
+        <video ref="videoPlayer" class="max-w-full w-full"></video>
     </div>
-    <div id="progress-bar-container" :style="{ display: uiHidden ? 'none' : 'flex' }">
+    <!-- Progress bar -->
+    <div class="flex flex-col w-[95%] bottom-[140px] relative mx-auto" :style="{ display: uiHidden ? 'none' : 'flex' }">
         <div
-            id="progress-bar-wrapper"
+            class="flex h-[14px] items-center z-40 cursor-pointer"
             @click="
                 (e) => {
                     progressBar
@@ -480,66 +514,67 @@ onUnmounted(() => {
                 }
             "
         >
-            <div id="progress-bar" ref="progressBar">
-                <div id="progress-color" :style="{ width: `${(currentTime / duration) * 100}%` }"></div>
+            <div
+                ref="progressBar"
+                class="bg-black w-full h-[5px] bg-opacity-50"
+                style="background: rgba(255, 255, 255, 0.5)"
+            >
+                <div class="w-0 bg-red-600 h-[5px]" :style="{ width: `${(currentTime / duration) * 100}%` }"></div>
                 <div
-                    id="progress-bar-circle"
                     ref="progressCircle"
+                    class="rounded-full aspect-square w-4 bg-red-600 outline outline-1 outline-white absolute top-0 cursor-grab z-50"
                     :style="{
                         left: `${circlePosition}%`
                     }"
                 ></div>
             </div>
         </div>
-        <div id="video-info-container">
-            <span id="video-current-time">{{ toHHMMSS(Math.round(currentTime).toString()) }}</span>
-            <span id="video-duration"></span>
+        <!-- Video information -->
+        <div class="mt-1 flex justify-between">
+            <span class="pointer-events-none">{{ toHHMMSS(Math.round(currentTime).toString()) }}</span>
+            <span>{{ toHHMMSS(Math.round(duration).toString()) }}</span>
         </div>
     </div>
+    <!-- Video controls -->
     <div
-        id="video-controls"
-        :style="{
-            display: uiHidden ? 'none' : 'flex',
-            justifyContent: 'space-between',
-            paddingLeft: '16px',
-            paddingRight: '16px',
-            background: uiHidden ? 'transparent' : 'linear-gradient(transparent, black)'
-        }"
+        :class="`w-full h-[80px] flex fixed bottom-0 left-0 items-center justify-between pl-8 pr-8 bg-gradient-to-b from-transparent to-black ${
+            uiHidden ? 'hidden' : ''
+        }`"
     >
-        <div style="display: flex; justify-content: start">
-            <button id="loop-button" @click="setLoopMode">
-                <div class="svg-container">
+        <div class="flex justify-start flex-1">
+            <button @click="setLoopMode" class="aspect-square w-[75px]">
+                <div class="flex items-center justify-center">
                     <Repeat :color="looping ? 'limegreen' : 'white'" />
                 </div>
             </button>
-            <button id="volume-button" @click="volume ? mute() : unmute()">
-                <div class="svg-container">
+            <button @click="volume ? mute() : unmute()" class="aspect-square w-[75px]">
+                <div class="flex items-center justify-center">
                     <VolumeX v-if="!volume" color="white" />
                     <Volume2 v-else color="white" />
                 </div>
             </button>
         </div>
-        <div style="display: flex; justify-content: center">
-            <button id="rewind-button" @click="() => rewindVideo(5)">
-                <div class="svg-container">
+        <div class="flex justify-center flex-1">
+            <button @click="() => rewindVideo(5)" class="aspect-square w-[75px]">
+                <div class="flex items-center justify-center">
                     <Rewind color="white" />
                 </div>
             </button>
-            <button id="play-button" @click="playVideo">
-                <div class="svg-container">
+            <button @click="playVideo" class="aspect-square w-[75px]">
+                <div class="flex items-center justify-center">
                     <Play v-if="!playing" color="white" />
                     <Pause v-else color="white" />
                 </div>
             </button>
-            <button id="forward-button" @click="() => forwardVideo(5)">
-                <div class="svg-container">
+            <button @click="() => forwardVideo(5)" class="aspect-square w-[75px]">
+                <div class="flex items-center justify-center">
                     <FastForward color="white" />
                 </div>
             </button>
         </div>
-        <div style="display: flex; justify-content: end">
-            <button id="maximise-button" @click="() => setFullscreen()">
-                <div class="svg-container">
+        <div class="flex justify-end flex-1">
+            <button @click="() => setFullscreen()" class="aspect-square w-[75px]">
+                <div class="flex items-center justify-center">
                     <Minimize color="white" v-if="isFullscreen" />
                     <Maximize color="white" v-else />
                 </div>
@@ -549,189 +584,6 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-#video-chooser > button {
-    aspect-ratio: 1 / 1;
-    width: 100px;
-    font-size: 20px;
-    border: 1px solid black;
-    border-radius: 5px;
-    font-family: "Inter", sans-serif;
-    background: #555557;
-    color: white;
-}
-
-#video-controls div {
-    flex-grow: 1;
-    flex-basis: 0;
-}
-
-#video-controls button:focus {
-    outline: 3px solid white;
-}
-
-#playspeed-indicator,
-#transformation-text,
-#video-info-container > span {
-    color: white;
-    font-family: "Inter", "Segoe UI", sans-serif;
-}
-
-#playspeed-indicator {
-    position: fixed;
-    top: 30px;
-}
-
-#transformation-alert {
-    border-radius: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-    align-items: center;
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    right: 0px;
-}
-
-#transformation-icon {
-    width: 20px;
-}
-
-#top-bar {
-    background-color: #252526;
-    min-height: 30px;
-    display: flex;
-}
-
-#top-bar-right-buttons {
-    float: right;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    flex-grow: 0;
-    width: 100px;
-}
-
-#drag-bar {
-    -webkit-app-region: drag;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-family: "Inter", "Segoe UI", sans-serif;
-}
-
-#main-video {
-    background: black;
-    max-height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-}
-
-#video-title {
-    pointer-events: none;
-    user-select: none;
-}
-
-#video-controls {
-    height: 80px;
-    display: flex;
-    position: fixed;
-    bottom: 0px;
-    left: 0px;
-    background: linear-gradient(transparent, black);
-    width: calc(100% - 32px);
-    justify-content: center;
-    align-items: center;
-}
-
-video {
-    max-height: 100%;
-    width: 100%;
-}
-
-#video-controls button,
-#top-bar > button {
-    width: 75px;
-    height: 75px;
-    background-color: transparent;
-    outline: none;
-    padding: 20px;
-    border: none;
-}
-
-#top-bar > button {
-    width: 30px;
-    height: 30px;
-    padding: 5px;
-}
-
-.svg-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-}
-
-#video-info-container {
-    margin-top: 5px;
-}
-
-#video-current-time {
-    float: left;
-    pointer-events: none;
-}
-
-#video-duration {
-    float: right;
-}
-
-#progress-bar-wrapper {
-    display: flex;
-    height: 14px;
-    align-items: center;
-    z-index: 55;
-    cursor: pointer;
-}
-
-#progress-bar-container {
-    display: flex;
-    flex-direction: column;
-    width: 95%;
-    bottom: 140px;
-    position: relative;
-    margin: 0 auto;
-}
-
-#progress-bar {
-    background: rgba(255, 255, 255, 0.5);
-    width: 100%;
-    height: 5px;
-}
-
-#progress-bar-circle {
-    border-radius: 100%;
-    width: 16px;
-    height: 16px;
-    background-color: red;
-    outline: 1px solid white;
-    position: absolute;
-    top: 0;
-    cursor: grab;
-    z-index: 60;
-}
-
-#progress-color {
-    width: 0%;
-    background-color: red;
-    height: 3px;
-    border: 2px solid red;
-}
-
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity 0.5s ease;
