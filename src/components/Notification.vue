@@ -1,15 +1,18 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import { refThrottled, useTimeoutFn, useTimestamp } from "@vueuse/core";
+import { refThrottled, useTimeoutFn, useTimestamp, useClipboard } from "@vueuse/core";
 import { ref, computed } from "vue";
 import { NotificationType } from "../vite-env";
-import { Info, CheckCircle, AlertTriangle, XOctagon } from "lucide-vue-next";
+import { Info, CheckCircle, AlertTriangle, XOctagon, Copy } from "lucide-vue-next";
+import { type } from "@tauri-apps/api/os";
 
 const props = withDefaults(defineProps<{ message: string; type?: NotificationType; expiryTime?: number }>(), {
     type: "info"
 });
 
 const emit = defineEmits(["close"]);
+
+const { copy } = useClipboard();
 
 const myAlert = ref<HTMLElement>();
 const initialTime = new Date().getTime();
@@ -51,6 +54,15 @@ if (props.expiryTime) {
                 </span>
                 {{ message }}
             </span>
+            <button
+                v-if="type === 'warning' || type === 'error'"
+                type="button"
+                class="p-0 text-md ms-3"
+                aria-label="Copy"
+                @click="copy(message)"
+            >
+                <Copy />
+            </button>
             <button
                 type="button"
                 class="p-0 text-md ms-3 underline underline-offset-2"
