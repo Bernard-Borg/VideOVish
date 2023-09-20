@@ -116,6 +116,18 @@ onUnmounted(() => {
     pause();
 });
 
+const formatBytes = (bytes: number, decimals: number = 2) => {
+    if (!+bytes) return "0 Bytes";
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ["Bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+};
+
 const clearCache = async () => {
     await invoke("clear_cache").then((result) => {
         if (result === "EMPTY") {
@@ -125,7 +137,16 @@ const clearCache = async () => {
                 timeout: 3000
             });
         } else if (result) {
-            add({
+            const numberResult = parseInt(result as string);
+
+            if (isNaN(numberResult)) {
+                console.warn("Clear cache return is not a number");
+                return;
+            }
+
+            result = formatBytes(numberResult);
+
+            result = add({
                 text: `Successfully cleared ${result}`,
                 type: "success",
                 timeout: 3000
