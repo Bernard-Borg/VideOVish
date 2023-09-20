@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NotificationRenderer from "../NotificationRenderer.vue";
 import { onBeforeMount, onMounted, onUnmounted, ref, computed, watch } from "vue";
 import { invoke } from "@tauri-apps/api";
 import { getMatches } from "@tauri-apps/api/cli";
@@ -184,18 +185,16 @@ const setFullscreen = async () => {
     await appWindow.setFullscreen(isFullscreen.value);
 };
 
-const playVideo = () => {
+const playVideo = async () => {
     if (!videoPlayer.value) {
         return;
     }
 
     if (playing.value) {
         videoPlayer.value.pause();
-
         displayTransformationAlert(Pause);
     } else {
-        videoPlayer.value.play();
-
+        await videoPlayer.value.play();
         displayTransformationAlert(Play);
     }
 };
@@ -306,6 +305,12 @@ const keyDownEventHandler = (event: KeyboardEvent) => {
         rewindVideo(10);
     } else if (event.key.toLowerCase() == "k") {
         forwardVideo(10);
+    } else if (event.key.toLowerCase() == "m") {
+        if (volume.value) {
+            mute();
+        } else {
+            unmute();
+        }
     } else if (event.key == "F1") {
         showHelpWindow();
     } else if (event.key == "F11") {
@@ -438,6 +443,7 @@ onUnmounted(() => {
 </script>
 
 <template>
+    <NotificationRenderer />
     <!-- Video chooser -->
     <div v-if="videoChooser" class="flex flex-col w-full h-full justify-center items-center bg-transparent">
         <div class="bg-charcoal p-[50px] flex gap-10 rounded-md outline-white outline-1 outline">
@@ -495,7 +501,7 @@ onUnmounted(() => {
             </div>
         </div>
     </div>
-    <!-- Plaayback rate -->
+    <!-- Playback rate -->
     <span v-if="!uiHidden" :class="`select-none absolute ${isFullscreen ? 'top-0' : 'top-[30px]'}`">{{
         rate.toFixed(2)
     }}</span>

@@ -12,16 +12,37 @@
             <div class="w-full">
                 <h2 class="text-2xl !font-semibold">Video Playback</h2>
                 <span class="text-sm inline-block mb-7">These shortcuts have to do with playing the video.</span>
-                <span class="block mb-3">PLAY/PAUSE <HelpKey extendWidth class="float-right">SPACE</HelpKey></span>
-                <span class="block mb-3">SLOW DOWN VIDEO <HelpKey class="float-right">S</HelpKey></span>
-                <span class="block mb-3">SPEED UP VIDEO <HelpKey class="float-right">D</HelpKey></span>
-                <span class="block mb-3">REWIND 5 SECONDS <HelpKey class="float-right">←</HelpKey></span>
-                <span class="block mb-3">FAST FORWARD 5 SECONDS <HelpKey class="float-right">→</HelpKey></span>
-                <span class="block mb-3">REWIND 10 SECONDS <HelpKey class="float-right">J</HelpKey></span>
-                <span class="block mb-3">FAST FORWARD 10 SECONDS <HelpKey class="float-right">K</HelpKey></span>
-                <span class="block mb-3">INCREASE VOLUME <HelpKey class="float-right">↑</HelpKey></span>
-                <span class="block mb-3">DECREASE VOLUME <HelpKey class="float-right">↓</HelpKey></span>
-                <span class="block mb-3">
+                <span class="flex items-center justify-between mb-3"
+                    >PLAY/PAUSE <HelpKey extendWidth class="float-right">SPACE</HelpKey></span
+                >
+                <span class="flex items-center justify-between mb-3"
+                    >SLOW DOWN VIDEO <HelpKey class="float-right">S</HelpKey></span
+                >
+                <span class="flex items-center justify-between mb-3"
+                    >SPEED UP VIDEO <HelpKey class="float-right">D</HelpKey></span
+                >
+                <span class="flex items-center justify-between mb-3"
+                    >REWIND 5 SECONDS <HelpKey class="float-right">←</HelpKey></span
+                >
+                <span class="flex items-center justify-between mb-3"
+                    >FAST FORWARD 5 SECONDS <HelpKey class="float-right">→</HelpKey></span
+                >
+                <span class="flex items-center justify-between mb-3"
+                    >REWIND 10 SECONDS <HelpKey class="float-right">J</HelpKey></span
+                >
+                <span class="flex items-center justify-between mb-3"
+                    >FAST FORWARD 10 SECONDS <HelpKey class="float-right">K</HelpKey></span
+                >
+                <span class="flex items-center justify-between mb-3"
+                    >INCREASE VOLUME <HelpKey class="float-right">↑</HelpKey></span
+                >
+                <span class="flex items-center justify-between mb-3"
+                    >DECREASE VOLUME <HelpKey class="float-right">↓</HelpKey></span
+                >
+                <span class="flex items-center justify-between mb-3"
+                    >MUTE/UNMUTE VOLUME <HelpKey class="float-right">M</HelpKey></span
+                >
+                <span class="flex items-center justify-between mb-3">
                     SEEK LOCATION
                     <span class="float-right">
                         <HelpKey>0</HelpKey>
@@ -33,7 +54,7 @@
             <div class="w-full">
                 <h2 class="text-2xl !font-semibold">App Management</h2>
                 <span class="text-sm inline-block mb-7">These shortcuts have to do with managing the app itself.</span>
-                <span class="block mb-3">
+                <span class="flex items-center justify-between mb-3">
                     HELP MENU
                     <span class="float-right">
                         <HelpKey>F1</HelpKey>
@@ -43,8 +64,10 @@
                         <HelpKey>/</HelpKey>
                     </span>
                 </span>
-                <span class="block mb-3">TOGGLE FULLSCREEN <HelpKey class="float-right">F11</HelpKey></span>
-                <span class="block mb-3">
+                <span class="flex items-center justify-between mb-3"
+                    >TOGGLE FULLSCREEN <HelpKey class="float-right">F11</HelpKey></span
+                >
+                <span class="flex items-center justify-between mb-3">
                     PICK VIDEO TO VIEW
                     <span class="float-right">
                         <HelpKey extendWidth>CTRL</HelpKey>
@@ -52,7 +75,9 @@
                         <HelpKey>O</HelpKey>
                     </span>
                 </span>
-                <span class="block mb-3">CLOSE SECONDARY WINDOW <HelpKey class="float-right">ESC</HelpKey></span>
+                <span class="flex items-center justify-between mb-3"
+                    >CLOSE SECONDARY WINDOW <HelpKey class="float-right">ESC</HelpKey></span
+                >
             </div>
         </div>
     </div>

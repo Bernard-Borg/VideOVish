@@ -1,6 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use fs_extra::dir::get_size;
 use std::{fs, path::Path};
 use tauri::{
     api::process::{Command, CommandEvent},
@@ -18,7 +19,7 @@ async fn show_help_window(handle: tauri::AppHandle) {
         "help", /* the unique window label */
         tauri::WindowUrl::App("help".into()),
     )
-    .inner_size(1024.0, 600.0)
+    .inner_size(1024.0, 700.0)
     .min_inner_size(480.0, 480.0)
     .skip_taskbar(true)
     .decorations(false)
@@ -55,6 +56,30 @@ struct Payload {
 }
 
 #[tauri::command]
+async fn clear_cache(handle: tauri::AppHandle) -> String {
+    // Get path to youtube_downloads foldre
+    let app_data_dir = handle.path_resolver().app_data_dir().unwrap();
+    let downloads_folder = Path::new(&app_data_dir).join("youtube_downloads");
+
+    // Create folder if it doesn't exist
+    if !downloads_folder.is_dir() {
+        fs::create_dir_all(&downloads_folder).expect("Could not create downloads folder");
+        return String::from("");
+    } else {
+        let size = get_size(&downloads_folder).unwrap();
+
+        if size <= 0 {
+            return String::from("EMPTY");
+        }
+
+        fs::remove_dir_all(&downloads_folder).expect("Could not delete downloads folder");
+        fs::create_dir_all(&downloads_folder).expect("Could not recreate downloads folder");
+
+        return String::from(format!("{}", size));
+    }
+}
+
+#[tauri::command]
 async fn download_video(handle: tauri::AppHandle, url: String, code: String) -> String {
     // Get path to youtube_downloads foldre
     let app_data_dir = handle.path_resolver().app_data_dir().unwrap();
@@ -66,24 +91,17 @@ async fn download_video(handle: tauri::AppHandle, url: String, code: String) -> 
     }
 
     let mut vid_path: String = String::from("");
+    let glob_pattern = format!("{}/youtube_downloads/*{}*", &app_data_dir.display(), code);
 
-    println!("Code: {}", code);
-
-    for entry in glob::glob(format!("{}/*[{}].*", downloads_folder.display(), code).as_str())
-        .expect("Failed to read glob pattern")
-    {
+    for entry in glob::glob(&glob_pattern).expect("Failed to read glob pattern") {
         match entry {
             Ok(path) => {
-                println!("Hi from rust");
                 vid_path = path.display().to_string();
-
                 break;
             }
             Err(e) => println!("{:?}", e),
         }
     }
-
-    println!("Video path: {}", vid_path);
 
     if vid_path.len() > 0 {
         println!("Getting video from cache");
@@ -111,8 +129,10 @@ async fn download_video(handle: tauri::AppHandle, url: String, code: String) -> 
             downloads_folder.display().to_string(),
             "--extractor-args".to_string(),
             "youtube:skip=hls,dash;youtube:skip=translated_subs".to_string(),
-            // "-f".to_string(),
-            // "137+251".to_string(),
+            "-f".to_string(),
+            "137+251".to_string(),
+            "--ffmpeg-location".to_string(),
+            "/binaries/ffmpeg.exe".to_string(),
             "--print".to_string(),
             "after_move:filepath".to_string(),
             "--no-simulate".to_string(),
@@ -158,7 +178,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             show_help_window,
             show_youtube_modal,
-            download_video
+            download_video,
+            clear_cache
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

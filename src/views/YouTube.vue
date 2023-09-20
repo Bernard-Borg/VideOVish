@@ -5,6 +5,7 @@ import { WebviewWindow, getCurrent } from "@tauri-apps/api/window";
 import { useIntervalFn, useOnline } from "@vueuse/core";
 import { X, Search } from "lucide-vue-next";
 import { Trash2 } from "lucide-vue-next";
+import { useNotification } from "../composables";
 
 const search = ref<string>("");
 const loadingText = ref<string>("");
@@ -13,6 +14,7 @@ const failureReason = ref<string>("");
 const preferredQuality = ref<number>(1);
 
 const online = useOnline();
+const { add } = useNotification();
 
 const closeWindow = async () => {
     await WebviewWindow.getByLabel("youtube")?.close();
@@ -115,7 +117,21 @@ onUnmounted(() => {
 });
 
 const clearCache = async () => {
-    await invoke("clear_cache");
+    await invoke("clear_cache").then((result) => {
+        if (result === "EMPTY") {
+            add({
+                text: "Cache already empty",
+                type: "info",
+                timeout: 3000
+            });
+        } else if (result) {
+            add({
+                text: `Successfully cleared ${result}`,
+                type: "success",
+                timeout: 3000
+            });
+        }
+    });
 };
 </script>
 
