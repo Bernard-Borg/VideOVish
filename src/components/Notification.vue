@@ -34,7 +34,7 @@ if (props.expiryTime) {
 <template>
     <div
         ref="myAlert"
-        :class="`max-w-[300px] rounded-lg flex flex-col p-0 overflow-hidden custom-alert-${type}`"
+        :class="`min-w-[300px] rounded-lg flex flex-col p-0 overflow-hidden custom-alert-${type}`"
         role="alert"
     >
         <div class="flex justify-between px-6 py-3">
@@ -53,29 +53,35 @@ if (props.expiryTime) {
                 </span>
                 {{ message }}
             </span>
-            <button
-                v-if="type === 'warning' || type === 'error'"
-                type="button"
-                class="p-0 text-md ms-3"
-                aria-label="Copy"
-                @click="copy(message)"
-            >
-                <Copy />
-            </button>
-            <button
-                type="button"
-                class="p-0 text-md ms-3 underline underline-offset-2"
-                aria-label="Close"
-                @click="$emit('close')"
-            >
-                OK
-            </button>
+            <span class="inline-flex justify-end">
+                <button
+                    v-if="type === 'warning' || type === 'error'"
+                    type="button"
+                    class="p-0 text-md ms-3"
+                    aria-label="Copy"
+                    @click="copy(message)"
+                >
+                    <Copy />
+                </button>
+                <button
+                    type="button"
+                    class="p-0 text-md ms-3 underline underline-offset-2"
+                    aria-label="Close"
+                    @click="$emit('close')"
+                >
+                    OK
+                </button>
+            </span>
         </div>
         <div v-if="expiryTime" class="h-[4px] bg-white rounded-b-lg" :style="`width: ${width}%`"></div>
     </div>
 </template>
 
 <style scoped>
+span {
+    color: unset;
+}
+
 .custom-alert-warning {
     background-color: #f8bd89;
     border: 1px solid orangered;

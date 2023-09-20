@@ -146,8 +146,8 @@ const clearCache = async () => {
 
             result = formatBytes(numberResult);
 
-            result = add({
-                text: `Successfully cleared ${result}`,
+            add({
+                text: `Cleared ${result} from cache`,
                 type: "success",
                 timeout: 3000
             });
