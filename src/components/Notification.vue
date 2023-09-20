@@ -4,7 +4,6 @@ import { refThrottled, useTimeoutFn, useTimestamp, useClipboard } from "@vueuse/
 import { ref, computed } from "vue";
 import { NotificationType } from "../vite-env";
 import { Info, CheckCircle, AlertTriangle, XOctagon, Copy } from "lucide-vue-next";
-import { type } from "@tauri-apps/api/os";
 
 const props = withDefaults(defineProps<{ message: string; type?: NotificationType; expiryTime?: number }>(), {
     type: "info"
