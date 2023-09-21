@@ -15,3 +15,11 @@ export type Notification = {
 };
 
 export type NotificationWithId = Notification & { id: string };
+
+export type HelpEntryCategory = "playback" | "management";
+
+export interface HelpEntry {
+    description: string;
+    keybind: string | Array<string | Connector>;
+    category: HelpEntryCategory;
+}
