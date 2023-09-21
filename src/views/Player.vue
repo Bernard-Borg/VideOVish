@@ -456,26 +456,26 @@ onUnmounted(() => {
     <div v-if="videoChooser" class="flex flex-col w-full h-full justify-center items-center bg-transparent">
         <div class="bg-charcoal p-[50px] flex gap-10 rounded-md outline-white outline-1 outline">
             <button
-                class="flex flex-col justify-center items-center aspect-square w-[100px] text-md font-sans rounded-md bg-gray-600 text-white"
+                class="flex flex-col justify-center items-center aspect-square w-[100px] text-md font-light font-sans rounded-md text-white hover:outline hover:outline-white hover:outline-1"
                 @click="showVideoDialog"
             >
-                <HardDrive :size="40" color="white" /> Local
+                <HardDrive :size="40" color="white" strokeWidth="1" /> Local
             </button>
             <button
-                class="flex flex-col justify-center items-center aspect-square w-[100px] text-md font-sans rounded-md bg-gray-600 text-white"
+                class="flex flex-col justify-center items-center aspect-square w-[100px] text-md font-light font-sans rounded-md text-white hover:outline hover:outline-white hover:outline-1"
                 @click="showYoutubeModal"
             >
-                <Youtube :size="40" fill="red" /> Youtube
+                <Youtube :size="40" fill="red" strokeWidth="1" /> Youtube
             </button>
             <button
-                class="flex flex-col justify-center items-center aspect-square w-[100px] text-md font-sans rounded-md bg-gray-600 text-white"
+                class="flex flex-col justify-center items-center aspect-square w-[100px] text-md font-light font-sans rounded-md text-white hover:outline hover:outline-white hover:outline-1"
                 @click="continueFromPrevious"
             >
-                <History :size="40" color="white" /> Previous
+                <History :size="40" color="white" strokeWidth="1" /> Previous
             </button>
         </div>
         <button
-            class="bg-charcoal outline outline-1 outline-white text-white mt-4 w-24 p-2 rounded-md"
+            class="bg-charcoal outline outline-1 outline-white text-white mt-4 w-24 p-2 rounded-md hover:bg-gray-700"
             @click="() => getCurrent().close()"
         >
             Quit
