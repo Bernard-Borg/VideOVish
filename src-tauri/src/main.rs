@@ -148,8 +148,6 @@ async fn download_video(
             "youtube:skip=hls,dash;youtube:skip=translated_subs".to_string(),
             "-f".to_string(),
             quality_code.to_string(),
-            "--ffmpeg-location".to_string(),
-            "/binaries/ffmpeg.exe".to_string(),
             "--print".to_string(),
             "after_move:filepath".to_string(),
             "--no-simulate".to_string(),
@@ -167,7 +165,7 @@ async fn download_video(
             }
         }
 
-        if !Path::new(&downloads_folder).join(&video_path).exists() {
+        if video_path.is_empty() || !Path::new(&downloads_folder).join(&video_path).exists() {
             return "Failed to download video";
         }
 
