@@ -30,6 +30,7 @@ import {
     History
 } from "lucide-vue-next";
 import type { Icon } from "lucide-vue-next";
+import { useNotification } from "../composables";
 
 const NUM_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 const PLAYBACK_SPEEDS = [0.07, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 5, 7.5, 10, 12, 14, 16];
@@ -66,6 +67,7 @@ const { playing, currentTime, duration, volume, rate } = useMediaControls(videoP
     src: videoSrc
 });
 
+const { add } = useNotification();
 useDraggable(progressCircle, {
     axis: "x",
     onMove: (e) => {
@@ -304,6 +306,7 @@ const keyDownEventHandler = (event: KeyboardEvent) => {
         changePlayrate(1);
     } else if (event.key.toLowerCase() == "s") {
         changePlayrate(0);
+        videoPlayer.value?.requestPictureInPicture();
     } else if (event.key.toLowerCase() == "j") {
         rewindVideo(10);
     } else if (event.key.toLowerCase() == "k") {
@@ -384,6 +387,16 @@ const continueFromPrevious = () => {
     } else {
         showVideoDialog();
     }
+};
+
+const handleVideoError = () => {
+    console.log("hi");
+
+    add({
+        text: "Video url invalid",
+        type: "error",
+        timeout: 10000
+    });
 };
 
 onBeforeMount(async () => {
@@ -525,7 +538,7 @@ onUnmounted(() => {
     </Transition>
     <!-- Video player -->
     <div @click="playVideo" class="bg-black max-h-full h-full">
-        <video ref="videoPlayer" class="max-w-full w-full"></video>
+        <video ref="videoPlayer" class="max-w-full w-full" @error="handleVideoError"></video>
     </div>
     <!-- Progress bar -->
     <div class="flex flex-col w-[95%] bottom-[140px] relative mx-auto" :style="{ display: uiHidden ? 'none' : 'flex' }">
