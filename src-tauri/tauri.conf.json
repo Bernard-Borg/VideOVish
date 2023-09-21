@@ -1,0 +1,64 @@
+{
+    "build": {
+        "beforeDevCommand": "yarn dev",
+        "beforeBuildCommand": "yarn build",
+        "devPath": "http://localhost:1420",
+        "distDir": "../dist",
+        "withGlobalTauri": false
+    },
+    "package": {
+        "productName": "videovish-tauri",
+        "version": "2.0.0"
+    },
+    "tauri": {
+        "allowlist": {
+            "all": true,
+            "fs": {
+                "all": true,
+                "scope": ["$APPDATA", "$APPDATA/*", "$APPDATA/youtube-downloads/*"]
+            },
+            "shell": {
+                "all": false,
+                "open": true
+            },
+            "protocol": {
+                "asset": true,
+                "assetScope": ["**"]
+            }
+        },
+        "bundle": {
+            "active": true,
+            "externalBin": ["binaries/yt-dlp", "binaries/ffmpeg"],
+            "targets": "all",
+            "identifier": "borg.videovish",
+            "icon": ["../VideoPlayerIcon.ico"]
+        },
+        "cli": {
+            "args": [
+                {
+                    "name": "videoPath",
+                    "index": 1,
+                    "takesValue": true
+                }
+            ]
+        },
+        "security": {
+            "csp": "default-src 'self'; script-src 'self'; media-src 'self' asset: https://asset.localhost; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com"
+        },
+        "windows": [
+            {
+                "label": "main",
+                "center": true,
+                "fullscreen": false,
+                "resizable": true,
+                "title": "VideOVish",
+                "width": 1920,
+                "height": 1080,
+                "minHeight": 480,
+                "minWidth": 480,
+                "decorations": false,
+                "titleBarStyle": "Overlay"
+            }
+        ]
+    }
+}
