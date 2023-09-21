@@ -11,7 +11,7 @@ const search = ref<string>("");
 const loadingText = ref<string>("");
 const searchFailed = ref<boolean>(false);
 const failureReason = ref<string>("");
-const preferredQuality = ref<number>(1);
+const preferredQuality = ref<string>("1");
 
 const online = useOnline();
 const { add } = useNotification();
@@ -80,13 +80,14 @@ const downloadVideo = async () => {
     }
 
     resume();
-    invoke("download_video", { url: search.value, code: hasMatched, quality: preferredQuality.value ?? 1 }).then(
+    invoke("download_video", { url: search.value, code: hasMatched, quality: preferredQuality.value ?? "1" }).then(
         (result) => {
             if (result === "") {
                 closeWindow(); //if download was successful, close window
             } else {
                 // if download wasn't, display error
                 pause();
+                loadingText.value = "";
                 searchFailed.value = true;
                 failureReason.value = result as string;
             }
@@ -157,18 +158,18 @@ const clearCache = async () => {
 </script>
 
 <template>
-    <div class="rounded-md bg-charcoal w-full h-full px-12 py-10" data-tauri-drag-region>
+    <div class="rounded-md bg-charcoal w-full h-full px-12 py-10 cursor-grab" data-tauri-drag-region>
         <h1 class="font-bold text-3xl">Search video</h1>
         <X color="white" class="absolute top-[10px] right-[10px]" @click="closeWindow" />
         <!-- Quality select -->
         <div class="flex items-center mt-4 justify-end w-[500px]">
             <span class="inline-block mr-3">Preferred Quality</span>
             <select v-model="preferredQuality" class="cursor-pointer">
-                <option :value="1" selected>1080p</option>
-                <option :value="2">720p</option>
-                <option :value="3">480p</option>
-                <option :value="4">240p</option>
-                <option :value="5">Audio only</option>
+                <option value="1" selected>1080p</option>
+                <option value="2">720p</option>
+                <option value="3">480p</option>
+                <option value="4">240p</option>
+                <option value="5">Audio only</option>
             </select>
         </div>
         <!-- Search bar -->
