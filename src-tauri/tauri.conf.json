@@ -28,7 +28,7 @@
         },
         "bundle": {
             "active": true,
-            "externalBin": ["binaries/yt-dlp"],
+            "externalBin": ["binaries/yt-dlp", "binaries/ffmpeg"],
             "targets": "all",
             "identifier": "borg.videovish",
             "icon": ["../VideoPlayerIcon.ico"]

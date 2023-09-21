@@ -42,6 +42,7 @@ async fn show_youtube_modal(handle: tauri::AppHandle) {
     )
     .inner_size(680.0, 250.0)
     .min_inner_size(480.0, 200.0)
+    .skip_taskbar(true)
     .decorations(false)
     .transparent(true)
     .always_on_top(true)
@@ -84,7 +85,7 @@ async fn download_video(
     handle: tauri::AppHandle,
     url: String,
     code: String,
-    quality: i32,
+    quality: String,
 ) -> String {
     // Get path to youtube_downloads foldre
     let app_data_dir = handle.path_resolver().app_data_dir().unwrap();
@@ -128,12 +129,12 @@ async fn download_video(
 
     let quality_code;
 
-    match quality {
-        1 => quality_code = "137+251",
-        2 => quality_code = "136+251",
-        3 => quality_code = "135+251",
-        4 => quality_code = "134+251",
-        5 => quality_code = "251",
+    match quality.as_str() {
+        "1" => quality_code = "137+251",
+        "2" => quality_code = "136+251",
+        "3" => quality_code = "135+251",
+        "4" => quality_code = "134+251",
+        "5" => quality_code = "251",
         _ => quality_code = "137+251",
     }
 
