@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { ref, onUnmounted, onMounted, watch } from "vue";
+import { ref, onUnmounted, watch } from "vue";
 import { invoke } from "@tauri-apps/api";
-import { WebviewWindow, getCurrent } from "@tauri-apps/api/window";
 import { useIntervalFn, useOnline } from "@vueuse/core";
 import { X, Search } from "lucide-vue-next";
 import { Trash2 } from "lucide-vue-next";
-import { useNotification } from "../composables";
+import { useNotification, useWindowClose } from "../composables";
 
 const search = ref<string>("");
 const loadingText = ref<string>("");
@@ -16,15 +15,7 @@ const preferredQuality = ref<string>("1");
 const online = useOnline();
 const { add } = useNotification();
 
-const closeWindow = async () => {
-    await WebviewWindow.getByLabel("youtube")?.close();
-};
-
-getCurrent().listen("tauri://blur", () => {
-    if (!loadingText.value) {
-        closeWindow();
-    }
-});
+const { closeWindow } = useWindowClose("youtube", !loadingText);
 
 // Loading... animation
 const animateLoadingText = () => {
@@ -46,12 +37,6 @@ const { pause, resume } = useIntervalFn(
     250,
     { immediate: false }
 );
-
-const keyUpEventHandler = async (event: KeyboardEvent) => {
-    if (event.code === "Escape") {
-        closeWindow();
-    }
-};
 
 const downloadVideo = async () => {
     searchFailed.value = false;
@@ -106,14 +91,7 @@ watch(search, () => {
     failureReason.value = "";
 });
 
-// Window setup and main logic
-onMounted(async () => {
-    // Close window when Escape is pressed
-    document.addEventListener("keyup", keyUpEventHandler);
-});
-
 onUnmounted(() => {
-    document.removeEventListener("keyup", keyUpEventHandler);
     pause();
 });
 

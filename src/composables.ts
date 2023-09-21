@@ -1,6 +1,8 @@
 import { useLocalStorage } from "@vueuse/core";
 import { Notification, NotificationWithId } from "./vite-env";
 import { v4 as uuid } from "uuid";
+import { WebviewWindow } from "@tauri-apps/api/window";
+import { Ref, isRef, onMounted, onUnmounted } from "vue";
 
 const store = useLocalStorage<{
     notifications: NotificationWithId[];
@@ -31,4 +33,38 @@ const useNotification = () => {
     return { add, remove };
 };
 
-export { useNotification };
+const useWindowClose = (label: string, disableBlur: boolean | Ref<boolean> = false) => {
+    const closeWindow = async () => {
+        await WebviewWindow.getByLabel(label)?.close();
+    };
+
+    const eventHandler = (e: KeyboardEvent) => {
+        if (e.code === "Escape") {
+            closeWindow();
+        }
+    };
+
+    WebviewWindow.getByLabel(label)?.listen("tauri://blur", () => {
+        if (isRef(disableBlur)) {
+            if (!disableBlur.value) {
+                closeWindow();
+            }
+        } else {
+            if (!disableBlur) {
+                closeWindow();
+            }
+        }
+    });
+
+    onMounted(() => {
+        window.addEventListener("keydown", eventHandler);
+    });
+
+    onUnmounted(() => {
+        window.removeEventListener("keydown", eventHandler);
+    });
+
+    return { closeWindow };
+};
+
+export { useNotification, useWindowClose };

@@ -1,31 +1,10 @@
 <script setup lang="ts">
-import { WebviewWindow, getCurrent } from "@tauri-apps/api/window";
 import { X } from "lucide-vue-next";
-import { onMounted, onUnmounted } from "vue";
 import HelpEntry from "../components/HelpEntry.vue";
 import { helpEntries } from "./Help";
+import { useWindowClose } from "../composables";
 
-const closeWindow = async () => {
-    await WebviewWindow.getByLabel("help")?.close();
-};
-
-getCurrent().listen("tauri://blur", () => {
-    closeWindow();
-});
-
-const eventHandler = (e: KeyboardEvent) => {
-    if (e.code === "Escape") {
-        closeWindow();
-    }
-};
-
-onMounted(() => {
-    window.addEventListener("keydown", eventHandler);
-});
-
-onUnmounted(() => {
-    window.removeEventListener("keydown", eventHandler);
-});
+const { closeWindow } = useWindowClose("help");
 </script>
 
 <template>
