@@ -80,7 +80,12 @@ async fn clear_cache(handle: tauri::AppHandle) -> String {
 }
 
 #[tauri::command]
-async fn download_video(handle: tauri::AppHandle, url: String, code: String) -> String {
+async fn download_video(
+    handle: tauri::AppHandle,
+    url: String,
+    code: String,
+    quality: i32,
+) -> String {
     // Get path to youtube_downloads foldre
     let app_data_dir = handle.path_resolver().app_data_dir().unwrap();
     let downloads_folder = Path::new(&app_data_dir).join("youtube_downloads");
@@ -121,6 +126,17 @@ async fn download_video(handle: tauri::AppHandle, url: String, code: String) -> 
         return "".to_string();
     }
 
+    let quality_code;
+
+    match quality {
+        1 => quality_code = "137+251",
+        2 => quality_code = "136+251",
+        3 => quality_code = "135+251",
+        4 => quality_code = "134+251",
+        5 => quality_code = "251",
+        _ => quality_code = "137+251",
+    }
+
     let (mut rx, mut _child) = Command::new_sidecar("yt-dlp")
         .expect("Failed to create yt-dlp binary command")
         .args([
@@ -130,7 +146,7 @@ async fn download_video(handle: tauri::AppHandle, url: String, code: String) -> 
             "--extractor-args".to_string(),
             "youtube:skip=hls,dash;youtube:skip=translated_subs".to_string(),
             "-f".to_string(),
-            "137+251".to_string(),
+            quality_code.to_string(),
             "--ffmpeg-location".to_string(),
             "/binaries/ffmpeg.exe".to_string(),
             "--print".to_string(),
