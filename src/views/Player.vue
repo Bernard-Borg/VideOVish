@@ -494,7 +494,7 @@ onUnmounted(() => {
             </div>
         </button>
         <div class="w-full flex justify-center items-center text-white">
-            <div class="flex flex-grow justify-center" data-tauri-drag-region>
+            <div class="flex flex-grow justify-center cursor-grab" data-tauri-drag-region>
                 <span
                     class="select-none cursor-pointer p-1 px-2 outline outline-1 rounded-md m-1 text-sm bg-black"
                     @click="showVideoChooser"
