@@ -194,7 +194,10 @@ const playVideo = async () => {
         videoPlayer.value.pause();
         displayTransformationAlert(Pause);
     } else {
-        await videoPlayer.value.play();
+        try {
+            await videoPlayer.value.play();
+        } catch (err) {}
+
         displayTransformationAlert(Play);
     }
 };
@@ -223,7 +226,7 @@ const loopBack = () => {
 };
 
 // Sets the src of the video
-const setVideoSource = async (filepath: string, title?: string) => {
+const setVideoSource = async (filepath: string, title?: string | null) => {
     if (!title) {
         title = await basename(filepath);
         const extension = await extname(filepath);
@@ -368,6 +371,7 @@ const showVideoChooser = () => {
 const continueFromPrevious = () => {
     const previousVideo = localStorage.getItem("last-video");
     const previousTime = localStorage.getItem("last-time");
+    const previousTitle = localStorage.getItem("last-title");
 
     if (previousTime) {
         currentTime.value = parseFloat(previousTime);
@@ -376,7 +380,7 @@ const continueFromPrevious = () => {
     }
 
     if (previousVideo) {
-        setVideoSource(previousVideo);
+        setVideoSource(previousVideo, previousTitle);
     } else {
         showVideoDialog();
     }
@@ -419,6 +423,10 @@ watch(volume, (newValue) => {
 
 watch(currentTime, (newValue) => {
     localStorage.setItem("last-time", `${newValue}`);
+});
+
+watch(videoTitle, (newValue) => {
+    localStorage.setItem("last-title", `${newValue}`);
 });
 
 onMounted(() => {
