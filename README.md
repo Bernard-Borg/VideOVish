@@ -23,7 +23,7 @@ Tauri (2.0) changes;
 - You can now clear cache from previously downloaded YouTube videos
 - The player now remembers where you left off, and your volume preference.
 - The user interface (including the icon family) has been redone
-- You can now download videos you've watched directly through the player (you no longer need to use online ad-plagued downloaders)
+- You can now download videos you've watched directly through the player (you no longer need to use online ad-plagued downloaders) [WIP]
 - The player now also no longer has those annoying Ctrl+O alerts.
 - The entire codebase has been rewritten, so now fixes and improvements can ship quicker
 - If an error occurs, you should be notified and these notifications allow you to quickly copy their information so that you can put it in an issue >_>
@@ -46,7 +46,6 @@ Thinking about;
 
 App ideas and bug testing were assisted by my friends [RPC263](https://www.youtube.com/channel/UCSeiYh0FIlEvGGxT49LK2ew) and [BabyYoda2001](https://github.com/BabyYoda2001) 
 
-Thank you Robert Condorache for your [review](https://www.softpedia.com/get/Multimedia/Video/Video-Players/VideOVish.shtml). 
-The majority of your suggestions have been implemented/are in the works.
+Thank you Robert Condorache for your [review](https://www.softpedia.com/get/Multimedia/Video/Video-Players/VideOVish.shtml). The majority of your suggestions have been implemented/are in the works.
 
 ***Note: I am very new to open-source and I do not know how everything works, so bare with my newbieness.***

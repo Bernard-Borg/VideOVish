@@ -15,7 +15,7 @@
             "all": true,
             "fs": {
                 "all": true,
-                "scope": ["$APPDATA", "$APPDATA/*", "$APPDATA/youtube-downloads/*"]
+                "scope": ["$APPDATA", "$APPDATA/*"]
             },
             "shell": {
                 "all": false,
