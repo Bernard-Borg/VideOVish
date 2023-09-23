@@ -1,11 +1,14 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use fs_extra::dir::get_size;
+use fs_extra::{
+    dir::get_size,
+    file::{copy_with_progress, CopyOptions, TransitProcess},
+};
 use std::{fs, path::Path};
 use tauri::{
     api::process::{Command, CommandEvent},
-    Manager,
+    AppHandle, Manager,
 };
 
 #[tauri::command]
@@ -188,13 +191,51 @@ async fn download_video(
     result.unwrap().to_string()
 }
 
+#[tauri::command]
+async fn save_youtube_video(handle: AppHandle, code: String, path_to_save: String) -> String {
+    // Get path to youtube_downloads folder
+    let app_data_dir = handle.path_resolver().app_data_dir().unwrap();
+    let downloads_folder = Path::new(&app_data_dir).join("youtube_downloads");
+
+    // Create folder if it doesn't exist
+    if !downloads_folder.is_dir() {
+        fs::create_dir_all(&downloads_folder).expect("Could not create downloads folder");
+    }
+
+    let mut vid_path: String = String::from("");
+    let glob_pattern = format!("{}/youtube_downloads/*{}*", &app_data_dir.display(), code);
+
+    for entry in glob::glob(&glob_pattern).expect("Failed to read glob pattern") {
+        match entry {
+            Ok(path) => {
+                vid_path = path.display().to_string();
+                break;
+            }
+            Err(e) => println!("{:?}", e),
+        }
+    }
+
+    if vid_path.len() > 0 {
+        let options = CopyOptions::new();
+        let progress_handler =
+            |process_info: TransitProcess| println!("{}", process_info.copied_bytes);
+
+        let _ = copy_with_progress(vid_path, path_to_save, &options, progress_handler);
+
+        return String::from("");
+    } else {
+        return String::from("Currently playing video has been deleted");
+    }
+}
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             show_help_window,
             show_youtube_modal,
             download_video,
-            clear_cache
+            clear_cache,
+            save_youtube_video
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

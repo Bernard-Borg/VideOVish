@@ -3,10 +3,10 @@ import NotificationRenderer from "../NotificationRenderer.vue";
 import { onBeforeMount, onMounted, onUnmounted, ref, computed, watch } from "vue";
 import { invoke } from "@tauri-apps/api";
 import { getMatches } from "@tauri-apps/api/cli";
-import { open } from "@tauri-apps/api/dialog";
+import { open, save } from "@tauri-apps/api/dialog";
 import { listen } from "@tauri-apps/api/event";
 import { exists } from "@tauri-apps/api/fs";
-import { basename, extname } from "@tauri-apps/api/path";
+import { basename, downloadDir, extname, join } from "@tauri-apps/api/path";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { getCurrent, appWindow, getAll, WebviewWindow } from "@tauri-apps/api/window";
 import { useDraggable, useMediaControls, useThrottleFn, useTimeoutFn } from "@vueuse/core";
@@ -31,6 +31,7 @@ import {
 } from "lucide-vue-next";
 import type { Icon } from "lucide-vue-next";
 import { useNotification } from "../composables";
+import { Save } from "lucide-vue-next";
 
 const NUM_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 const PLAYBACK_SPEEDS = [0.07, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 5, 7.5, 10, 12, 14, 16];
@@ -51,6 +52,7 @@ const progressCircle = ref<HTMLDivElement | null>(null);
 const looping = ref<boolean>();
 const isFullscreen = ref<boolean>(false);
 const uiHidden = ref<boolean>(false);
+const isYoutube = ref<boolean>(false);
 
 const volumeCache = ref<number>(0.5);
 
@@ -291,6 +293,46 @@ const showYoutubeModal = async () => {
     await invoke("show_youtube_modal");
 };
 
+const saveYouTubeVideo = async () => {
+    const lastYoutubeCode = localStorage.getItem("last-youtube-code");
+
+    if (!lastYoutubeCode) {
+        add({
+            text: "You haven't downloaded a YouTube video yet",
+            type: "warning",
+            timeout: 5000
+        });
+    }
+
+    const downloadDirectory = await downloadDir();
+
+    const filePath = await save({
+        title: "Save YouTube video",
+        defaultPath: await join(downloadDirectory, `${videoTitle.value ?? "video"}.mp4`),
+        filters: [{ name: "Video", extensions: VALID_EXTENSIONS }]
+    });
+
+    if (!filePath) {
+        return;
+    }
+
+    invoke("save_youtube_video", { code: lastYoutubeCode, pathToSave: filePath }).then((result) => {
+        if (result) {
+            add({
+                text: result as string,
+                type: "error",
+                timeout: 10000
+            });
+        } else {
+            add({
+                text: "Saved successfully",
+                type: "success",
+                timeout: 3000
+            });
+        }
+    });
+};
+
 const setLoopMode = () => {
     if (looping.value) {
         videoPlayer.value?.removeEventListener("ended", loopBack);
@@ -375,11 +417,18 @@ const continueFromPrevious = () => {
     const previousVideo = localStorage.getItem("last-video");
     const previousTime = localStorage.getItem("last-time");
     const previousTitle = localStorage.getItem("last-title");
+    const previousIsYoutube = localStorage.getItem("last-is-youtube");
 
     if (previousTime) {
         currentTime.value = parseFloat(previousTime);
     } else {
         currentTime.value = 0;
+    }
+
+    if (previousIsYoutube === "true") {
+        isYoutube.value = true;
+    } else {
+        isYoutube.value = false;
     }
 
     if (previousVideo) {
@@ -404,11 +453,15 @@ onBeforeMount(async () => {
 
     // Handles the IPC event emitted when the user picks a youtube video
     listen("video-downloaded", async (event) => {
+        isYoutube.value = true;
+
         const payload = event.payload as { path: string; code: string };
 
         const temp = await basename(payload.path);
         const index = temp.indexOf(`[${payload.code}]`);
         const title = temp.substring(0, index - 1);
+
+        localStorage.setItem("last-youtube-code", payload.code);
 
         setVideoSource(payload.path, title);
     });
@@ -440,6 +493,10 @@ watch(currentTime, (newValue) => {
 
 watch(videoTitle, (newValue) => {
     localStorage.setItem("last-title", `${newValue}`);
+});
+
+watch(isYoutube, (newValue) => {
+    localStorage.setItem("last-is-youtube", `${newValue}`);
 });
 
 onMounted(() => {
@@ -504,6 +561,11 @@ onUnmounted(() => {
         <button ref="youtubeButton" @click="showYoutubeModal">
             <div class="flex items-center justify-center">
                 <Youtube fill="red" color="white" />
+            </div>
+        </button>
+        <button v-if="isYoutube" ref="saveButton" @click="saveYouTubeVideo">
+            <div class="flex items-center justify-center">
+                <Save color="white" />
             </div>
         </button>
         <div class="w-full flex justify-center items-center text-white">

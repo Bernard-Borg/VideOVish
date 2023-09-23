@@ -15,7 +15,7 @@ The feature set and interface of the video player was inspired by both Windows' 
 
 Tauri (2.0) changes;
 
-- The entire program is now much (about 5x) smaller in size and should load quicker
+- The entire program is now (about 2-3x) smaller in size and should load quicker
 - Downloading YouTube videos now takes less time, and better quality downloads are available
 - A quick mute button and shortcut have been added
 - You can now drag the progress bar circle to move the video back/forward (while viewing what you're seeking to)
