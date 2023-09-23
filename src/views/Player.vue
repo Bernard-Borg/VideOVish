@@ -348,7 +348,6 @@ const keyDownEventHandler = (event: KeyboardEvent) => {
         changePlayrate(1);
     } else if (event.key.toLowerCase() == "s") {
         changePlayrate(0);
-        videoPlayer.value?.requestPictureInPicture();
     } else if (event.key.toLowerCase() == "j") {
         rewindVideo(10);
     } else if (event.key.toLowerCase() == "k") {
@@ -558,12 +557,12 @@ onUnmounted(() => {
                 <Info color="white" fill="#1958b7" />
             </div>
         </button>
-        <button ref="youtubeButton" @click="showYoutubeModal">
+        <button ref="youtubeButton" @click="showYoutubeModal" class="aspect-square w-[30px] p-1">
             <div class="flex items-center justify-center">
                 <Youtube fill="red" color="white" />
             </div>
         </button>
-        <button v-if="isYoutube" ref="saveButton" @click="saveYouTubeVideo">
+        <button v-if="isYoutube" ref="saveButton" @click="saveYouTubeVideo" class="aspect-square w-[30px] p-1">
             <div class="flex items-center justify-center">
                 <Save color="white" />
             </div>

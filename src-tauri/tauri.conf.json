@@ -12,14 +12,22 @@
     },
     "tauri": {
         "allowlist": {
-            "all": true,
+            "dialog": {
+                "open": true,
+                "save": true
+            },
             "fs": {
-                "all": true,
+                "exists": true,
                 "scope": ["$APPDATA", "$APPDATA/*"]
             },
+            "path": {
+                "all": true
+            },
+            "window": {
+                "all": true
+            },
             "shell": {
-                "all": false,
-                "open": true
+                "all": true
             },
             "protocol": {
                 "asset": true,
