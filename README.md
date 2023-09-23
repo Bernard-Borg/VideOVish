@@ -1,4 +1,5 @@
 # VideOVish
+
 A minimalist video player app which supports MP4, OGG and WEBM, MKV and MOV formats (can also play MP3 audio files) and can play/download YouTube videos - rebuilt from the ground up with Tauri, Vue and TailwindCSS!
 
 ## Features
@@ -23,7 +24,7 @@ Tauri (2.0) changes;
 - You can now clear cache from previously downloaded YouTube videos
 - The player now remembers where you left off, and your volume preference.
 - The user interface (including the icon family) has been redone
-- You can now download videos you've watched directly through the player (you no longer need to use online ad-plagued downloaders) [WIP]
+- You can now download videos you've watched directly through the player (you no longer need to use online ad-plagued downloaders)
 - The player now also no longer has those annoying Ctrl+O alerts.
 - The entire codebase has been rewritten, so now fixes and improvements can ship quicker
 - If an error occurs, you should be notified and these notifications allow you to quickly copy their information so that you can put it in an issue >_>
@@ -40,7 +41,13 @@ Thinking about;
 
 - Searching for YouTube videos (this is a quite a bit more complicated than I thought, so bear with me)
 - YouTube video subtitles
-- Reducing file size even further
+- Reducing file size even further (a smaller version of ffmpeg would be ideal - optionally, ffmpeg can also be disableable during installation, but this would require adjustments to the YouTube downloader to only allow 1080p+ if this module has been installed/the user provides their own ffmpeg path)
+- Picture in picture mode
+- Fixing the "preferred quality" to fallback to lower qualities when higher ones aren't available
+- Better error messages when downloading youtube video + progress bar for longer videos
+- When saving a YouTube video it provides the correct file path to that video/audio (right now it just assumed .mp4)
+- Rewriting the backend when I understand Rust better (I'm sure I've made some inefficiencies there)
+- Supporting other formats/streaming video while it's downloading
 
 ## Contributions
 
