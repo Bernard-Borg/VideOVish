@@ -20,12 +20,12 @@ Tauri (2.0) changes;
 - Downloading YouTube videos now takes less time, and better quality downloads are available
 - A quick mute button and shortcut have been added
 - You can now drag the progress bar circle to move the video back/forward (while viewing what you're seeking to)
-- You can now changed volume using the mouse's scroll wheel
+- You can now change volume using the mouse's scroll wheel
 - You can now clear cache from previously downloaded YouTube videos
-- The player now remembers where you left off, and your volume preference.
-- The user interface (including the icon family) has been redone
+- The video player now remembers where you left off, and your volume preference.
+- The user interface (including the icons) has been redone
 - You can now download videos you've watched directly through the player (you no longer need to use online ad-plagued downloaders)
-- The player now also no longer has those annoying Ctrl+O alerts.
+- The video player now also no longer has those annoying Ctrl+O alerts.
 - The entire codebase has been rewritten, so now fixes and improvements can ship quicker
 - If an error occurs, you should be notified and these notifications allow you to quickly copy their information so that you can put it in an issue >_>
 
