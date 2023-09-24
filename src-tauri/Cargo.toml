@@ -1,7 +1,7 @@
 [package]
 name = "videovish-tauri"
 version = "2.0.0-beta"
-description = "A Tauri video player"
+description = "VideOVish"
 authors = ["Bernard-Borg"]
 license = "GNU GPLv3"
 repository = "https://github.com/Bernard-Borg/VideOVish"
