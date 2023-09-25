@@ -39,7 +39,12 @@
             "externalBin": ["binaries/yt-dlp", "binaries/ffmpeg"],
             "targets": "all",
             "identifier": "borg.videovish",
-            "icon": ["../VideoPlayerIcon.ico"]
+            "icon": ["../VideoPlayerIcon.ico"],
+            "windows": {
+                "webviewInstallMode": {
+                    "type": "embedBootstrapper"
+                }
+            }
         },
         "cli": {
             "args": [
