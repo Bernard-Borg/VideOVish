@@ -8,7 +8,7 @@
     },
     "package": {
         "productName": "videovish-tauri",
-        "version": "../package.json"
+        "version": "2.0.1"
     },
     "tauri": {
         "allowlist": {
