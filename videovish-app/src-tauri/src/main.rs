@@ -43,8 +43,9 @@ async fn show_youtube_modal(handle: tauri::AppHandle) {
         "youtube", /* the unique window label */
         tauri::WindowUrl::App("youtube".into()),
     )
-    .inner_size(680.0, 250.0)
+    .inner_size(780.0, 250.0)
     .min_inner_size(480.0, 200.0)
+    .resizable(true)
     .skip_taskbar(true)
     .decorations(false)
     .transparent(true)
