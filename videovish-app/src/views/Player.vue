@@ -286,7 +286,7 @@ const showYoutubeModal = async () => {
     //The following is to prevent the modal from being opened again when pressing space after it has been closed
     youtubeButton.value?.blur();
 
-    if (!playing.value) {
+    if (playing.value) {
         playVideo();
     }
 
