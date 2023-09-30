@@ -576,11 +576,12 @@ onUnmounted(() => {
                     {{ videoTitle ?? "Change Video" }}
                 </span>
             </div>
-            <div class="float-right flex items-center justify-around flex-grow-0 w-[100px]">
-                <Minus @click="() => getCurrent().minimize()" color="white" :size="20" />
-                <Square @click="() => getCurrent().maximize()" color="white" :size="20" />
-                <X @click="() => getCurrent().close()" color="white" :size="20" />
-            </div>
+            <div class="w-[100px]"></div>
+        </div>
+        <div class="fixed top-0 right-0 flex items-center h-[36px] justify-around flex-grow-0 w-[100px]">
+            <Minus class="cursor-pointer" @click="() => getCurrent().minimize()" color="white" :size="20" />
+            <Square class="cursor-pointer" @click="() => getCurrent().maximize()" color="white" :size="20" />
+            <X class="cursor-pointer" @click="() => getCurrent().close()" color="white" :size="20" />
         </div>
     </div>
     <!-- Playback rate -->
@@ -599,7 +600,7 @@ onUnmounted(() => {
     </Transition>
     <!-- Video player -->
     <div @click="playVideo" class="bg-black max-h-full h-full">
-        <video ref="videoPlayer" class="max-w-full w-full" @error="handleVideoError"></video>
+        <video ref="videoPlayer" class="max-h-full max-w-full w-full" @error="handleVideoError"></video>
     </div>
     <!-- Progress bar -->
     <div class="flex flex-col w-[95%] bottom-[140px] relative mx-auto" :style="{ display: uiHidden ? 'none' : 'flex' }">
