@@ -14,7 +14,7 @@ const store = useLocalStorage<{
 </script>
 
 <template>
-    <div class="fixed flex flex-col items-end w-full top-[40px] h-[300px] p-3 gap-3 z-[100]">
+    <div class="fixed flex flex-col items-end w-full top-[40px] p-3 gap-3 z-[100]">
         <TransitionGroup name="notifications">
             <Notification
                 v-for="notification in store.notifications"
