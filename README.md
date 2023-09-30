@@ -14,28 +14,11 @@ The feature set and interface of the video player was inspired by both Windows' 
 - Playing a video from Youtube (using the URL)
 - Downloading videos from YouTube (URL/Search term)
 
-Tauri (2.0) changes;
-
-- The entire program is now (about 2-3x) smaller in size and should load quicker
-- Downloading YouTube videos now takes less time, and better quality downloads are available
-- A quick mute button and shortcut have been added
-- You can now drag the progress bar circle to move the video back/forward (while viewing what you're seeking to)
-- You can now change volume using the mouse's scroll wheel
-- You can now clear cache from previously downloaded YouTube videos
-- The video player now remembers where you left off, and your volume preference.
-- The user interface (including the icons) has been redone
-- You can now download videos you've watched directly through the player (you no longer need to use online ad-plagued downloaders)
-- The video player now also no longer has those annoying Ctrl+O alerts.
-- The entire codebase has been rewritten, so now fixes and improvements can ship quicker
-- If an error occurs, you should be notified and these notifications allow you to quickly copy their information so that you can put it in an issue >_>
-
 ## App screenshot
 
 ![image](https://user-images.githubusercontent.com/35971384/208214326-63067413-8acc-4e0b-b727-5fb9f56456bc.png)
 
 ## Contributions
-
-App ideas and bug testing were assisted by my friends [RPC263](https://www.youtube.com/channel/UCSeiYh0FIlEvGGxT49LK2ew) and [BabyYoda2001](https://github.com/BabyYoda2001) 
 
 Thank you Robert Condorache for your [review](https://www.softpedia.com/get/Multimedia/Video/Video-Players/VideOVish.shtml). The majority of your suggestions have been implemented/are in the works.
 
