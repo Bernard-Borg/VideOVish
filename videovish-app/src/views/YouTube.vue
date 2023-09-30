@@ -119,7 +119,7 @@ const clearCache = async () => {
             const numberResult = parseInt(result as string);
 
             if (isNaN(numberResult)) {
-                console.warn("Clear cache return is not a number");
+                console.error("Clear cache return is not a number");
                 return;
             }
 
