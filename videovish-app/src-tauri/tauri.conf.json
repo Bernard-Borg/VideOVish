@@ -56,7 +56,7 @@
             ]
         },
         "security": {
-            "csp": "default-src 'self'; connect-src https://videovish.vercel.app; script-src 'self'; media-src 'self' asset: https://asset.localhost; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com"
+            "csp": "default-src 'self'; connect-src https://videovish.vercel.app 'self'; script-src 'self'; img-src https://i.ytimg.com 'self'; media-src 'self' asset: https://asset.localhost; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com"
         },
         "windows": [
             {
