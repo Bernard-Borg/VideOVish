@@ -42,7 +42,7 @@ const { pause, resume } = useIntervalFn(
 );
 
 const searchVideo = async () => {
-    const result = (await fetch(`http://localhost:3000/api/videovish?search=${search.value}&region=US`, {
+    const result = (await fetch(`https://videovish.vercel.app/api/videovish?search=${search.value}&region=US`, {
         method: "POST",
         body: JSON.stringify({
             apiKey: import.meta.env.VITE_API_KEY
