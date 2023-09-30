@@ -33,22 +33,6 @@ Tauri (2.0) changes;
 
 ![image](https://user-images.githubusercontent.com/35971384/208214326-63067413-8acc-4e0b-b727-5fb9f56456bc.png)
 
-## Further possible improvements
-
-Any suggestions are welcome (feel free to open any Issues with improvement suggestions). Despite this, I work full time and might not have too much available time to work on them.
-
-Thinking about;
-
-- YouTube video subtitles
-- Reducing file size even further (a smaller version of ffmpeg would be ideal - optionally, ffmpeg can also be disableable during installation, but this would require adjustments to the YouTube downloader to only allow 1080p+ if this module has been installed/the user provides their own ffmpeg path)
-- Picture in picture mode
-- Fixing the "preferred quality" to fallback to lower qualities when higher ones aren't available
-- Better error messages when downloading youtube video + progress bar for longer videos
-- When saving a YouTube video it provides the correct file path to that video/audio (right now it just assumed .mp4)
-- Rewriting the backend when I understand Rust better (I'm sure I've made some inefficiencies there)
-- Supporting other formats/streaming video while it's downloading
-- Multi-language support
-
 ## Contributions
 
 App ideas and bug testing were assisted by my friends [RPC263](https://www.youtube.com/channel/UCSeiYh0FIlEvGGxT49LK2ew) and [BabyYoda2001](https://github.com/BabyYoda2001) 
