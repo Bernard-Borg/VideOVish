@@ -12,7 +12,7 @@ The feature set and interface of the video player was inspired by both Windows' 
 - Video seeking (hotkeys 0 - 9, or the progress bar like on YouTube)
 - Video looping
 - Playing a video from Youtube (using the URL)
-- Downloading videos from YouTube
+- Downloading videos from YouTube (URL/Search term)
 
 Tauri (2.0) changes;
 
@@ -39,7 +39,6 @@ Any suggestions are welcome (feel free to open any Issues with improvement sugge
 
 Thinking about;
 
-- Searching for YouTube videos (this is a quite a bit more complicated than I thought, so bear with me)
 - YouTube video subtitles
 - Reducing file size even further (a smaller version of ffmpeg would be ideal - optionally, ffmpeg can also be disableable during installation, but this would require adjustments to the YouTube downloader to only allow 1080p+ if this module has been installed/the user provides their own ffmpeg path)
 - Picture in picture mode
@@ -48,6 +47,7 @@ Thinking about;
 - When saving a YouTube video it provides the correct file path to that video/audio (right now it just assumed .mp4)
 - Rewriting the backend when I understand Rust better (I'm sure I've made some inefficiencies there)
 - Supporting other formats/streaming video while it's downloading
+- Multi-language support
 
 ## Contributions
 

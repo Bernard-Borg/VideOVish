@@ -2,20 +2,23 @@
 import { ref, onUnmounted, watch } from "vue";
 import { invoke } from "@tauri-apps/api";
 import { useIntervalFn, useOnline } from "@vueuse/core";
-import { X, Search } from "lucide-vue-next";
+import { X, Search, ExternalLink } from "lucide-vue-next";
 import { Trash2 } from "lucide-vue-next";
 import { useNotification, useWindowClose } from "../composables";
+import { getCurrent } from "@tauri-apps/api/window";
+import type { Schema$SearchListResponse, Schema$SearchResult } from "youtube-api";
 
 const search = ref<string>("");
 const loadingText = ref<string>("");
 const searchFailed = ref<boolean>(false);
+const searchResults = ref<Array<Schema$SearchResult>>([]);
 const failureReason = ref<string>("");
 const preferredQuality = ref<string>("1");
 
 const online = useOnline();
 const { add } = useNotification();
 
-const { closeWindow } = useWindowClose("youtube", !loadingText);
+const { closeWindow } = useWindowClose("youtube", true);
 
 // Loading... animation
 const animateLoadingText = () => {
@@ -38,7 +41,40 @@ const { pause, resume } = useIntervalFn(
     { immediate: false }
 );
 
+const searchVideo = async () => {
+    const result = (await fetch(`http://localhost:3000/api/videovish?search=${search.value}&region=US`, {
+        method: "POST",
+        body: JSON.stringify({
+            apiKey: import.meta.env.VITE_API_KEY
+        })
+    }).then((result) => result.json())) as Schema$SearchListResponse;
+
+    searchResults.value = result.items ?? [];
+    getCurrent().setFullscreen(true);
+};
+
+const startVideoDownload = (url: string, code: string) => {
+    resume();
+
+    invoke("download_video", {
+        url: url,
+        code: code,
+        quality: preferredQuality.value ?? "1"
+    }).then((result) => {
+        if (result === "") {
+            closeWindow(); //if download was successful, close window
+        } else {
+            // if download wasn't, display error
+            pause();
+            loadingText.value = "";
+            searchFailed.value = true;
+            failureReason.value = result as string;
+        }
+    });
+};
+
 const downloadVideo = async () => {
+    searchResults.value = [];
     searchFailed.value = false;
     failureReason.value = "";
 
@@ -56,28 +92,14 @@ const downloadVideo = async () => {
 
     const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
     const match = search.value.match(regExp);
-    const hasMatched = match && match[7].length === 11 ? match[7] : false;
+    const youtubeVideoCode = match && match[7].length === 11 ? match[7] : false;
 
-    if (!hasMatched) {
-        searchFailed.value = true;
-        failureReason.value = "Not a YouTube URL";
+    if (!youtubeVideoCode) {
+        await searchVideo();
         return;
     }
 
-    resume();
-    invoke("download_video", { url: search.value, code: hasMatched, quality: preferredQuality.value ?? "1" }).then(
-        (result) => {
-            if (result === "") {
-                closeWindow(); //if download was successful, close window
-            } else {
-                // if download wasn't, display error
-                pause();
-                loadingText.value = "";
-                searchFailed.value = true;
-                failureReason.value = result as string;
-            }
-        }
-    );
+    startVideoDownload(search.value, youtubeVideoCode);
 };
 
 const getVideo = (event: KeyboardEvent) => {
@@ -137,11 +159,11 @@ const clearCache = async () => {
 
 <template>
     <div class="rounded-md bg-charcoal w-full h-full px-12 py-10 cursor-grab" data-tauri-drag-region>
-        <h1 class="font-bold text-3xl">Search video</h1>
+        <h1 class="font-bold text-3xl pointer-events-none">Search video</h1>
         <X color="white" class="absolute top-[10px] right-[10px]" @click="closeWindow" />
         <!-- Quality select -->
         <div class="flex items-center mt-4 justify-end w-[500px]">
-            <span class="inline-block mr-3">Preferred Quality</span>
+            <span class="inline-block mr-3 pointer-events-none">Preferred Quality</span>
             <select v-model="preferredQuality" class="cursor-pointer">
                 <option value="1" selected>1080p</option>
                 <option value="2">720p</option>
@@ -159,7 +181,7 @@ const clearCache = async () => {
                     :class="`rounded-md p-[15px] w-full text-md ${
                         failureReason ? 'outline outline-1 outline-red-600' : ''
                     }`"
-                    placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    placeholder="ex: PewDiePie or https://www.youtube.com/watch?v=dQw4w9WgXcQ"
                     @keydown.tab="search = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
                     @keyup="getVideo"
                 />
@@ -174,6 +196,59 @@ const clearCache = async () => {
         >
             <Trash2 />
         </button>
-        <span class="absolute left-0 bottom-0 p-3" v-if="loadingText">{{ loadingText }}</span>
+        <span class="absolute left-0 bottom-0 p-3 pointer-events-none" v-if="loadingText">{{ loadingText }}</span>
+        <!-- Search results -->
+        <div class="flex flex-col gap-3 text-white mt-3 overflow-scroll">
+            <div
+                v-for="searchResult in searchResults"
+                class="flex items-center px-6 py-0 border border-1 border-black justify-between bg-red-900 hover:bg-red-800 rounded-md cursor-pointer select-none"
+                @click="
+                    startVideoDownload(
+                        `https://www.youtube.com/watch?v=${searchResult.id?.videoId}`,
+                        searchResult.id?.videoId ?? ''
+                    )
+                "
+            >
+                <template v-if="searchResult.id?.videoId">
+                    <div class="flex flex-col">
+                        <span class="text-lg font-bold">{{ searchResult.snippet?.title }}</span>
+                        <span
+                            ><span class="font-semibold">Channel: </span>{{ searchResult.snippet?.channelTitle }}</span
+                        >
+                    </div>
+                    <div class="flex gap-10">
+                        <div class="flex items-center gap-3">
+                            <a
+                                v-if="searchResult.id?.videoId"
+                                :href="`https://www.youtube.com/watch?v=${searchResult.id?.videoId}`"
+                                target="_blank"
+                            >
+                                <ExternalLink :size="35" title="Open in YouTube" />
+                            </a>
+                        </div>
+                        <img
+                            v-if="searchResult.snippet?.thumbnails?.maxres?.url"
+                            :src="searchResult.snippet.thumbnails.maxres.url"
+                            class="aspect-video h-[140px] overflow-clip"
+                        />
+                        <img
+                            v-else-if="searchResult.snippet?.thumbnails?.high?.url"
+                            :src="searchResult.snippet.thumbnails.high.url"
+                            class="aspect-video h-[140px] overflow-clip"
+                        />
+                        <img
+                            v-else-if="searchResult.snippet?.thumbnails?.medium?.url"
+                            :src="searchResult.snippet.thumbnails.medium.url"
+                            class="aspect-video h-[140px] overflow-clip"
+                        />
+                        <img
+                            v-else-if="searchResult.snippet?.thumbnails?.standard?.url"
+                            :src="searchResult.snippet.thumbnails.standard.url"
+                            class="aspect-video h-[140px] overflow-clip"
+                        />
+                    </div>
+                </template>
+            </div>
+        </div>
     </div>
 </template>

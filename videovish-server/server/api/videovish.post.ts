@@ -10,7 +10,7 @@ const runtimeConfig = useRuntimeConfig();
 export default defineEventHandler(async (event) => {
     try {
         const query = getQuery(event);
-        const body = await readBody(event);
+        const body = await readBody(event).then((result) => JSON.parse(result));
 
         if (runtimeConfig.API_KEY.length !== 36) {
             console.warn("Invalid API key set in environment variables");
