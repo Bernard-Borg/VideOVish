@@ -261,6 +261,7 @@ const showVideoDialog = async () => {
         filters: [{ name: "Supported Video Files", extensions: VALID_EXTENSIONS }]
     }).then((videoPath) => {
         if (videoPath) {
+            isYoutube.value = false;
             setVideoSource(videoPath as string);
         }
     });
@@ -438,8 +439,6 @@ const continueFromPrevious = () => {
 };
 
 const handleVideoError = () => {
-    console.log("hi");
-
     add({
         text: "Video url invalid",
         type: "error",
