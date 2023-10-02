@@ -1,5 +1,5 @@
 import { useLocalStorage } from "@vueuse/core";
-import { Notification, NotificationWithId } from "./vite-env";
+import { Notification, NotificationWithId } from "./types";
 import { v4 as uuid } from "uuid";
 import { WebviewWindow } from "@tauri-apps/api/window";
 import { Ref, isRef, onMounted, onUnmounted } from "vue";

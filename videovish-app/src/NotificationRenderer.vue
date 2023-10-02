@@ -2,7 +2,7 @@
 import { useNotification } from "./composables";
 import Notification from "./components/Notification.vue";
 import { useLocalStorage } from "@vueuse/core";
-import { NotificationWithId } from "./vite-env";
+import { NotificationWithId } from "./types";
 
 const { remove } = useNotification();
 

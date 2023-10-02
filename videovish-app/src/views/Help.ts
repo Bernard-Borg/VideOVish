@@ -1,4 +1,4 @@
-import { HelpEntry } from "../vite-env";
+import { HelpEntry } from "../types";
 
 const Connector = {
     TO: "to",
@@ -64,7 +64,7 @@ const helpEntries: HelpEntry[] = [
     },
     {
         description: "HELP MENU",
-        keybind: ["F1", Connector.OR, "CTRL", Connector.AND, "/"],
+        keybind: ["F1", Connector.AND, "CTRL", Connector.AND, "/"],
         category: "management"
     },
     {

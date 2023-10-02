@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import NotificationRenderer from "../NotificationRenderer.vue";
+import NotificationRenderer from "../../NotificationRenderer.vue";
 import { onBeforeMount, onMounted, onUnmounted, ref, computed, watch } from "vue";
 import { invoke } from "@tauri-apps/api";
 import { getMatches } from "@tauri-apps/api/cli";
@@ -30,7 +30,7 @@ import {
     History
 } from "lucide-vue-next";
 import type { Icon } from "lucide-vue-next";
-import { useNotification } from "../composables";
+import { useNotification } from "../../composables";
 import { Save } from "lucide-vue-next";
 
 const NUM_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];

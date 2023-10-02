@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import { refThrottled, useTimeoutFn, useTimestamp, useClipboard } from "@vueuse/core";
 import { ref, computed } from "vue";
-import { NotificationType } from "../vite-env";
+import { NotificationType } from "../types";
 import { Info, CheckCircle, AlertTriangle, XOctagon, Copy } from "lucide-vue-next";
 
 const props = withDefaults(defineProps<{ message: string; type?: NotificationType; expiryTime?: number }>(), {
