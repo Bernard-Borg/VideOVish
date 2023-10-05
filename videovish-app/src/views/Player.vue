@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import NotificationRenderer from "../../NotificationRenderer.vue";
+import NotificationRenderer from "../NotificationRenderer.vue";
+import VideoChooser from "./VideoChooser.vue";
 import { onBeforeMount, onMounted, onUnmounted, ref, computed, watch } from "vue";
 import { invoke } from "@tauri-apps/api";
 import { getMatches } from "@tauri-apps/api/cli";
@@ -25,12 +26,10 @@ import {
     Volume2,
     Minus,
     Square,
-    X,
-    HardDrive,
-    History
+    X
 } from "lucide-vue-next";
 import type { Icon } from "lucide-vue-next";
-import { useNotification } from "../../composables";
+import { useNotification } from "../composables";
 import { Save } from "lucide-vue-next";
 
 const NUM_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
@@ -58,7 +57,7 @@ const volumeCache = ref<number>(0.5);
 
 const videoSrc = ref<string>("");
 const videoTitle = ref<string>();
-const videoChooser = ref<boolean>(false);
+const choosingVideo = ref<boolean>(false);
 
 const transformationIcon = ref<Icon>();
 const transformationText = ref<string>();
@@ -70,6 +69,7 @@ const { playing, currentTime, duration, volume, rate } = useMediaControls(videoP
 });
 
 const { add } = useNotification();
+
 useDraggable(progressCircle, {
     axis: "x",
     onMove: (e) => {
@@ -219,6 +219,10 @@ const changePlayrate = (direction: number) => {
     }
 
     rate.value = PLAYBACK_SPEEDS[playbackIndex];
+
+    stop();
+    uiHidden.value = false;
+    start();
 };
 
 // Loops the video
@@ -238,7 +242,7 @@ const setVideoSource = async (filepath: string, title?: string | null) => {
     }
 
     localStorage.setItem("last-video", `${filepath}`);
-    videoChooser.value = false;
+    choosingVideo.value = false;
 
     filepath = convertFileSrc(filepath);
 
@@ -387,7 +391,7 @@ const keyUpEventHandler = (event: KeyboardEvent) => {
 };
 
 const mouseMoveHandler = () => {
-    if (videoChooser.value) {
+    if (choosingVideo.value) {
         uiHidden.value = true;
         return;
     }
@@ -410,7 +414,7 @@ const showVideoChooser = () => {
         playVideo();
     }
 
-    videoChooser.value = true;
+    choosingVideo.value = true;
 };
 
 const continueFromPrevious = () => {
@@ -520,45 +524,23 @@ onUnmounted(() => {
 
 <template>
     <NotificationRenderer />
-    <!-- Video chooser -->
-    <div v-if="videoChooser" class="flex flex-col w-full h-full justify-center items-center bg-transparent">
-        <div class="bg-charcoal p-[50px] flex gap-10 rounded-md outline-white outline-1 outline">
-            <button
-                class="flex flex-col justify-center items-center aspect-square w-[100px] text-md font-light font-sans rounded-md text-white hover:outline hover:outline-white hover:outline-1"
-                @click="showVideoDialog"
-            >
-                <HardDrive :size="40" color="white" strokeWidth="1" /> Local
-            </button>
-            <button
-                class="flex flex-col justify-center items-center aspect-square w-[100px] text-md font-light font-sans rounded-md text-white hover:outline hover:outline-white hover:outline-1"
-                @click="showYoutubeModal"
-            >
-                <Youtube :size="40" fill="red" strokeWidth="1" /> Youtube
-            </button>
-            <button
-                class="flex flex-col justify-center items-center aspect-square w-[100px] text-md font-light font-sans rounded-md text-white hover:outline hover:outline-white hover:outline-1"
-                @click="continueFromPrevious"
-            >
-                <History :size="40" color="white" strokeWidth="1" /> Previous
-            </button>
-        </div>
-        <button
-            class="bg-charcoal outline outline-1 outline-white text-white mt-4 w-24 p-2 rounded-md hover:bg-gray-700"
-            @click="() => getCurrent().close()"
-        >
-            Quit
-        </button>
-    </div>
+    <VideoChooser
+        v-if="choosingVideo"
+        @local="showVideoDialog"
+        @youtube="showYoutubeModal"
+        @previous="continueFromPrevious"
+        @quit="getCurrent().close()"
+    />
     <!-- Top bar -->
     <div class="bg-charcoal min-h-[30px] flex gap-1" v-if="!isFullscreen">
         <button @click="showHelpWindow" class="aspect-square w-[30px] p-1">
             <div class="flex items-center justify-center">
-                <Info color="white" fill="#1958b7" />
+                <Info color="white" fill="#1958b7" :strokeWidth="1.5" />
             </div>
         </button>
         <button ref="youtubeButton" @click="showYoutubeModal" class="aspect-square w-[30px] p-1">
             <div class="flex items-center justify-center">
-                <Youtube fill="red" color="white" />
+                <Youtube fill="red" color="white" :strokeWidth="1.5" />
             </div>
         </button>
         <button v-if="isYoutube" ref="saveButton" @click="saveYouTubeVideo" class="aspect-square w-[30px] p-1">

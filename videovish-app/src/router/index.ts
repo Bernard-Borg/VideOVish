@@ -1,4 +1,4 @@
-import Player from "../views/player/Player.vue";
+import Player from "../views/Player.vue";
 import Help from "../views/Help.vue";
 import YouTube from "../views/YouTube.vue";
 import { createRouter, createWebHistory } from "vue-router";
