@@ -10,7 +10,7 @@ import { exists } from "@tauri-apps/api/fs";
 import { basename, downloadDir, extname, join } from "@tauri-apps/api/path";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { getCurrent, appWindow, getAll, WebviewWindow } from "@tauri-apps/api/window";
-import { useDraggable, useMediaControls, useThrottleFn, useTimeoutFn } from "@vueuse/core";
+import { useDraggable, useLocalStorage, useMediaControls, useThrottleFn, useTimeoutFn } from "@vueuse/core";
 import {
     Info,
     Play,
@@ -26,11 +26,13 @@ import {
     Volume2,
     Minus,
     Square,
-    X
+    X,
+    Home,
+    Save
 } from "lucide-vue-next";
 import type { Icon } from "lucide-vue-next";
 import { useNotification } from "../composables";
-import { Save } from "lucide-vue-next";
+import type { History } from "../types";
 
 const NUM_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 const PLAYBACK_SPEEDS = [0.07, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 5, 7.5, 10, 12, 14, 16];
@@ -241,7 +243,7 @@ const setVideoSource = async (filepath: string, title?: string | null) => {
         title = title.replace(`.${extension}`, "");
     }
 
-    localStorage.setItem("last-video", `${filepath}`);
+    history.value.video = filepath;
     choosingVideo.value = false;
 
     filepath = convertFileSrc(filepath);
@@ -273,7 +275,7 @@ const showVideoDialog = async () => {
 
 // Shows the help modal
 const showHelpWindow = async () => {
-    if (!playing.value) {
+    if (playing.value) {
         playVideo();
     }
 
@@ -299,7 +301,7 @@ const showYoutubeModal = async () => {
 };
 
 const saveYouTubeVideo = async () => {
-    const lastYoutubeCode = localStorage.getItem("last-youtube-code");
+    const lastYoutubeCode = history.value.youtubeCode;
 
     if (!lastYoutubeCode) {
         add({
@@ -410,26 +412,26 @@ const wheelHandler = useThrottleFn((e: WheelEvent) => {
 }, 125);
 
 const showVideoChooser = () => {
+    choosingVideo.value = true;
+
     if (playing.value) {
         playVideo();
     }
-
-    choosingVideo.value = true;
 };
 
 const continueFromPrevious = () => {
-    const previousVideo = localStorage.getItem("last-video");
-    const previousTime = localStorage.getItem("last-time");
-    const previousTitle = localStorage.getItem("last-title");
-    const previousIsYoutube = localStorage.getItem("last-is-youtube");
+    const previousVideo = history.value.video;
+    const previousTime = history.value.time;
+    const previousTitle = history.value.title;
+    const previousIsYoutube = history.value.isYoutube;
 
-    if (previousTime) {
-        currentTime.value = parseFloat(previousTime);
+    if (typeof previousTime === "number") {
+        currentTime.value = previousTime;
     } else {
         currentTime.value = 0;
     }
 
-    if (previousIsYoutube === "true") {
+    if (previousIsYoutube === true) {
         isYoutube.value = true;
     } else {
         isYoutube.value = false;
@@ -463,7 +465,7 @@ onBeforeMount(async () => {
         const index = temp.indexOf(`[${payload.code}]`);
         const title = temp.substring(0, index - 1);
 
-        localStorage.setItem("last-youtube-code", payload.code);
+        history.value.youtubeCode = payload.code;
 
         setVideoSource(payload.path, title);
     });
@@ -485,21 +487,43 @@ onBeforeMount(async () => {
     showVideoChooser();
 });
 
+const history = useLocalStorage<History>("history", {
+    volume: 0.5,
+    time: 0,
+    title: undefined,
+    isYoutube: false,
+    video: undefined,
+    youtubeCode: undefined
+});
+
 watch(volume, (newValue) => {
-    localStorage.setItem("last-volume", `${newValue}`);
+    history.value.volume = newValue;
 });
 
 watch(currentTime, (newValue) => {
-    localStorage.setItem("last-time", `${newValue}`);
+    history.value.time = newValue;
 });
 
 watch(videoTitle, (newValue) => {
-    localStorage.setItem("last-title", `${newValue}`);
+    history.value.title = newValue;
 });
 
 watch(isYoutube, (newValue) => {
-    localStorage.setItem("last-is-youtube", `${newValue}`);
+    history.value.isYoutube = newValue;
 });
+
+watch(
+    () => history.value.video,
+    (newValue) => {
+        if (!newValue && videoPlayer.value) {
+            if (playing.value) {
+                playVideo();
+            }
+
+            showVideoChooser();
+        }
+    }
+);
 
 onMounted(() => {
     window.addEventListener("keydown", keyDownEventHandler);
@@ -507,10 +531,8 @@ onMounted(() => {
     window.addEventListener("mousemove", mouseMoveHandler);
     window.addEventListener("wheel", wheelHandler);
 
-    const lastVolume = localStorage.getItem("last-volume");
-
-    if (lastVolume && !isNaN(parseFloat(lastVolume))) {
-        volume.value = parseFloat(lastVolume);
+    if (typeof history.value.volume === "number") {
+        volume.value = history.value.volume;
     }
 });
 
@@ -526,6 +548,7 @@ onUnmounted(() => {
     <NotificationRenderer />
     <VideoChooser
         v-if="choosingVideo"
+        :previousVideo="history.video"
         @local="showVideoDialog"
         @youtube="showYoutubeModal"
         @previous="continueFromPrevious"
@@ -543,6 +566,11 @@ onUnmounted(() => {
                 <Youtube fill="red" color="white" :strokeWidth="1.5" />
             </div>
         </button>
+        <button ref="homeButton" @click="showVideoChooser" class="aspect-square w-[30px] p-1">
+            <div class="flex items-center justify-center">
+                <Home class="inline-block" color="white" :strokeWidth="1.5" />
+            </div>
+        </button>
         <button v-if="isYoutube" ref="saveButton" @click="saveYouTubeVideo" class="aspect-square w-[30px] p-1">
             <div class="flex items-center justify-center">
                 <Save color="white" />
@@ -551,18 +579,31 @@ onUnmounted(() => {
         <div class="w-full flex justify-center items-center text-white">
             <div class="flex flex-grow justify-center cursor-grab" data-tauri-drag-region>
                 <span
-                    class="select-none cursor-pointer p-1 px-2 outline outline-1 rounded-md m-1 text-sm bg-black"
+                    v-if="videoTitle"
+                    class="select-none cursor-pointer p-1 px-2 outline outline-1 rounded-md m-1 text-sm bg-black hover:bg-charcoal"
+                    title="Change Video"
                     @click="showVideoChooser"
                 >
-                    {{ videoTitle ?? "Change Video" }}
+                    {{ videoTitle }}
                 </span>
             </div>
             <div class="w-[100px]"></div>
         </div>
         <div class="fixed top-0 right-0 flex items-center h-[36px] justify-around flex-grow-0 w-[100px]">
-            <Minus class="cursor-pointer" @click="() => getCurrent().minimize()" color="white" :size="20" />
-            <Square class="cursor-pointer" @click="() => getCurrent().maximize()" color="white" :size="20" />
-            <X class="cursor-pointer" @click="() => getCurrent().close()" color="white" :size="20" />
+            <Minus
+                class="cursor-pointer text-white hover:text-slate-300"
+                @click="() => getCurrent().minimize()"
+                :size="20"
+            />
+            <Square
+                class="cursor-pointer text-white hover:text-slate-300"
+                @click="
+                    async () =>
+                        (await getCurrent().isMaximized()) ? getCurrent().unmaximize() : getCurrent().maximize()
+                "
+                :size="20"
+            />
+            <X class="cursor-pointer text-white hover:text-slate-300" @click="() => getCurrent().close()" :size="20" />
         </div>
     </div>
     <!-- Playback rate -->

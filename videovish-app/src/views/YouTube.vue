@@ -1,19 +1,30 @@
 <script setup lang="ts">
 import { ref, onUnmounted, watch } from "vue";
 import { invoke } from "@tauri-apps/api";
-import { useIntervalFn, useOnline } from "@vueuse/core";
+import { useIntervalFn, useLocalStorage, useOnline } from "@vueuse/core";
 import { X, Search, ExternalLink } from "lucide-vue-next";
 import { Trash2 } from "lucide-vue-next";
 import { useNotification, useWindowClose } from "../composables";
 import { getCurrent } from "@tauri-apps/api/window";
 import type { Schema$SearchListResponse, Schema$SearchResult } from "youtube-api";
+import type { History } from "../types";
 
 const search = ref<string>("");
 const loadingText = ref<string>("");
 const searchFailed = ref<boolean>(false);
 const searchResults = ref<Array<Schema$SearchResult>>([]);
 const failureReason = ref<string>("");
-const preferredQuality = ref<string>("1");
+
+const preferredQuality = useLocalStorage<string>("preferred-quality", "1");
+
+const history = useLocalStorage<History>("history", {
+    volume: 0.5,
+    time: 0,
+    title: undefined,
+    isYoutube: false,
+    video: undefined,
+    youtubeCode: undefined
+});
 
 const online = useOnline();
 const { add } = useNotification();
@@ -152,6 +163,14 @@ const clearCache = async () => {
                 type: "success",
                 timeout: 3000
             });
+
+            if (history.value.isYoutube) {
+                history.value.video = undefined;
+                history.value.time = 0;
+                history.value.title = undefined;
+                history.value.isYoutube = false;
+                history.value.youtubeCode = undefined;
+            }
         }
     });
 };
@@ -166,7 +185,7 @@ const clearCache = async () => {
             <div class="flex items-center mt-4 justify-end w-[600px]">
                 <span class="inline-block mr-3 pointer-events-none">Preferred Quality</span>
                 <select v-model="preferredQuality" class="cursor-pointer">
-                    <option value="1" selected>1080p</option>
+                    <option value="1">1080p</option>
                     <option value="2">720p</option>
                     <option value="3">480p</option>
                     <option value="4">240p</option>
@@ -205,7 +224,8 @@ const clearCache = async () => {
                 <div
                     v-for="searchResult in searchResults"
                     class="flex items-center px-6 py-0 border border-1 border-black justify-between bg-red-900 hover:bg-red-800 rounded-md cursor-pointer select-none"
-                    @click="
+                    title="Open in YouTube"
+                    @click.self="
                         startVideoDownload(
                             `https://www.youtube.com/watch?v=${searchResult.id?.videoId}`,
                             searchResult.id?.videoId ?? ''
@@ -213,7 +233,7 @@ const clearCache = async () => {
                     "
                 >
                     <template v-if="searchResult.id?.videoId">
-                        <div class="flex flex-col">
+                        <div class="flex flex-col pointer-events-none">
                             <span class="text-lg font-bold">{{ searchResult.snippet?.title }}</span>
                             <span
                                 ><span class="font-semibold">Channel: </span

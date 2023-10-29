@@ -4,13 +4,13 @@ import HelpEntry from "../components/HelpEntry.vue";
 import { helpEntries } from "./Help";
 import { useWindowClose } from "../composables";
 
-const { closeWindow } = useWindowClose("help");
+const { closeWindow } = useWindowClose("help", true);
 </script>
 
 <template>
     <div class="rounded-sm bg-charcoal w-full h-full overflow-y-scroll">
         <div
-            class="flex items-center justify-between px-8 py-4 border-b border-solid"
+            class="flex items-center justify-between px-8 py-4 border-b border-solid cursor-grab"
             data-tauri-drag-region
             style="border-color: rgb(30, 30, 30)"
         >

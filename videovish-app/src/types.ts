@@ -15,3 +15,12 @@ export interface HelpEntry {
     keybind: string | Array<string>;
     category: HelpEntryCategory;
 }
+
+export interface History {
+    volume?: number;
+    time?: number;
+    title?: string;
+    isYoutube?: boolean;
+    video?: string;
+    youtubeCode?: string;
+}

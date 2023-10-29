@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { HardDrive, Youtube, History } from "lucide-vue-next";
 
+defineProps<{ previousVideo?: string }>();
+
 defineEmits(["local", "youtube", "previous", "quit"]);
 </script>
 
 <template>
-    <div class="flex flex-col w-full h-full justify-center items-center bg-transparent">
+    <div class="flex flex-col w-full h-full justify-center items-center bg-transparent" data-tauri-drag-region>
+        <div class="p-1 text-white z-10 px-3 font-light">Choose video source</div>
         <div class="bg-charcoal p-[50px] flex gap-10 rounded-md outline-white outline-1 outline">
             <button
                 class="flex flex-col justify-center items-center aspect-square w-[100px] text-md font-light font-sans rounded-md text-white hover:outline hover:outline-white hover:outline-1"
@@ -20,6 +23,7 @@ defineEmits(["local", "youtube", "previous", "quit"]);
                 <Youtube :size="40" fill="red" strokeWidth="1" /> Youtube
             </button>
             <button
+                v-if="previousVideo"
                 class="flex flex-col justify-center items-center aspect-square w-[100px] text-md font-light font-sans rounded-md text-white hover:outline hover:outline-white hover:outline-1"
                 @click="$emit('previous')"
             >
