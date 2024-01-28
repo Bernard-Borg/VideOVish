@@ -74,6 +74,7 @@ export default defineEventHandler(async (event) => {
 
         return response;
     } catch (e) {
+        console.error(e);
         return createError({
             statusCode: 500,
             statusMessage: "The server failed to process this request",
