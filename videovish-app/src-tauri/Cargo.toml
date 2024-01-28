@@ -1,6 +1,6 @@
 [package]
 name = "videovish-tauri"
-version = "2.0.1-beta"
+version = "2.1.1-beta"
 description = "VideOVish"
 authors = ["Bernard-Borg"]
 license = "GNU GPLv3"
