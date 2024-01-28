@@ -134,12 +134,12 @@ async fn download_video(
     let quality_code;
 
     match quality.as_str() {
-        "1" => quality_code = "137+251",
-        "2" => quality_code = "136+251",
-        "3" => quality_code = "135+251",
+        "1" => quality_code = "137+251/136+251/135+251/134+251",
+        "2" => quality_code = "136+251/135+251/134+251",
+        "3" => quality_code = "135+251/134+251",
         "4" => quality_code = "134+251",
         "5" => quality_code = "251",
-        _ => quality_code = "137+251",
+        _ => quality_code = "137+251/136+251/135+251/134+251",
     }
 
     let (mut rx, mut _child) = Command::new_sidecar("yt-dlp")
