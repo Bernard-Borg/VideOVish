@@ -16,7 +16,7 @@ The feature set and interface of the video player was inspired by both Windows' 
 
 ## App screenshot
 
-![image](https://user-images.githubusercontent.com/35971384/208214326-63067413-8acc-4e0b-b727-5fb9f56456bc.png)
+![VideOVish_Screenshot](https://github.com/Bernard-Borg/VideOVish/assets/35971384/ccc4faa1-98e5-463f-98a0-15dbd70ec801)
 
 ## Contributions
 
