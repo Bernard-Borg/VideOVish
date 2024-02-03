@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import NotificationRenderer from "../NotificationRenderer.vue";
 import VideoChooser from "./VideoChooser.vue";
-import { onBeforeMount, onMounted, onUnmounted, ref, computed, watch } from "vue";
+import { onBeforeMount, onMounted, onUnmounted, ref, computed, watch, shallowRef } from "vue";
 import { invoke } from "@tauri-apps/api";
 import { getMatches } from "@tauri-apps/api/cli";
 import { open, save } from "@tauri-apps/api/dialog";
@@ -47,13 +47,12 @@ getCurrent().onCloseRequested(() => {
 
 const youtubeButton = ref<HTMLButtonElement | null>(null);
 const progressBar = ref<HTMLDivElement | null>(null);
-const videoPlayer = ref<HTMLVideoElement | null>(null);
-const progressCircle = ref<HTMLDivElement | null>(null);
+const videoPlayer = shallowRef<HTMLVideoElement | null>(null);
+const progressCircle = shallowRef<HTMLDivElement | null>(null);
 
 const looping = ref<boolean>();
 const isFullscreen = ref<boolean>(false);
 const uiHidden = ref<boolean>(false);
-const isYoutube = ref<boolean>(false);
 
 const volumeCache = ref<number>(0.5);
 
@@ -267,7 +266,7 @@ const showVideoDialog = async () => {
         filters: [{ name: "Supported Video Files", extensions: VALID_EXTENSIONS }]
     }).then((videoPath) => {
         if (videoPath) {
-            isYoutube.value = false;
+            history.value.isYoutube = false;
             setVideoSource(videoPath as string);
         }
     });
@@ -423,18 +422,11 @@ const continueFromPrevious = () => {
     const previousVideo = history.value.video;
     const previousTime = history.value.time;
     const previousTitle = history.value.title;
-    const previousIsYoutube = history.value.isYoutube;
 
     if (typeof previousTime === "number") {
         currentTime.value = previousTime;
     } else {
         currentTime.value = 0;
-    }
-
-    if (previousIsYoutube === true) {
-        isYoutube.value = true;
-    } else {
-        isYoutube.value = false;
     }
 
     if (previousVideo) {
@@ -457,7 +449,7 @@ onBeforeMount(async () => {
 
     // Handles the IPC event emitted when the user picks a youtube video
     listen("video-downloaded", async (event) => {
-        isYoutube.value = true;
+        history.value.isYoutube = true;
 
         const payload = event.payload as { path: string; code: string };
 
@@ -506,10 +498,6 @@ watch(currentTime, (newValue) => {
 
 watch(videoTitle, (newValue) => {
     history.value.title = newValue;
-});
-
-watch(isYoutube, (newValue) => {
-    history.value.isYoutube = newValue;
 });
 
 watch(
@@ -571,7 +559,7 @@ onUnmounted(() => {
                 <Home class="inline-block" color="white" :strokeWidth="1.5" />
             </div>
         </button>
-        <button v-if="isYoutube" ref="saveButton" @click="saveYouTubeVideo" class="aspect-square w-[30px] p-1">
+        <button v-if="history.isYoutube" ref="saveButton" @click="saveYouTubeVideo" class="aspect-square w-[30px] p-1">
             <div class="flex items-center justify-center">
                 <Save color="white" />
             </div>
