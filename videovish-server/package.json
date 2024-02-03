@@ -25,6 +25,7 @@
         "iso-3166-1": "^2.1.1"
     },
     "resolutions": {
+        "jackspeak": "2.1.1",
         "string-width": "4.2.3"
     },
     "version": "0.0.0"
