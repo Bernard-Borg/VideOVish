@@ -169,7 +169,15 @@ async fn download_video(
             }
         }
 
-        if video_path.is_empty() || !Path::new(&downloads_folder).join(&video_path).exists() {
+        // Clear any trailing \n or \r\n
+        if video_path.ends_with('\n') {
+            video_path.pop();
+            if video_path.ends_with('\r') {
+                video_path.pop();
+            }
+        }
+
+        if video_path.is_empty() || (!Path::new(&downloads_folder).join(&video_path).exists()) {
             return "Failed to download video";
         }
 
