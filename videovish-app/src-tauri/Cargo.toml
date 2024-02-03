@@ -1,6 +1,6 @@
 [package]
 name = "videovish-tauri"
-version = "2.1.1-beta"
+version = "2.1.2-beta"
 description = "VideOVish"
 authors = ["Bernard-Borg"]
 license = "GNU GPLv3"
@@ -10,10 +10,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.4", features = [] }
+tauri-build = { version = "1.5.1", features = [] }
 
 [dependencies]
-tauri = { version = "1.4", features = [ "shell-all", "path-all", "fs-exists", "dialog-save", "window-all", "dialog-open", "protocol-asset", "cli"] }
+tauri = { version = "1.5.4", features = [ "shell-all", "path-all", "fs-exists", "dialog-save", "window-all", "dialog-open", "protocol-asset", "cli"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 glob = "0.3.1"
