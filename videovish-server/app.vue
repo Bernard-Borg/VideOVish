@@ -19,7 +19,7 @@ useHead({
         </div>
         <a class="text-xl" href="https://github.com/Bernard-Borg/VideOVish/releases">Download</a>
     </div>
-    <span>An open-source minimalistic desktop video player and YouTube downloader for Windows</span>
+    <span>An open-source minimalistic desktop video player and YouTube downloader for Windows 7+ and Linux (soon)</span>
     <div
         class="flex fixed p-3 bottom-[10px] right-[10px] gap-2 outline outline-1 outline-black rounded-md bg-slate-100"
     >
