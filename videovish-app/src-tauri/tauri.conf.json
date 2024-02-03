@@ -7,8 +7,8 @@
         "withGlobalTauri": false
     },
     "package": {
-        "productName": "videovish-tauri",
-        "version": "2.1.1"
+        "productName": "VideoVish",
+        "version": "2.1.2"
     },
     "tauri": {
         "allowlist": {
