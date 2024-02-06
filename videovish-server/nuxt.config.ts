@@ -1,5 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+    app: {
+        head: {
+            meta: [{ name: "google-site-verification", content: "_wSxbjEo1coYAcGSykHsVB6cW54Vf2DehrRxToKw6sc" }]
+        }
+    },
     modules: ["nuxt-security"],
     security: {
         corsHandler: {
