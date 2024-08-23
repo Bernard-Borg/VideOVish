@@ -10,12 +10,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.5.1", features = [] }
+tauri-build = { version = "1.5.4", features = [] }
 
 [dependencies]
-tauri = { version = "1.5.4", features = [ "shell-all", "path-all", "fs-exists", "dialog-save", "window-all", "dialog-open", "protocol-asset", "cli"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+tauri = { version = "1.6.7", features = [ "shell-all", "path-all", "fs-exists", "dialog-save", "window-all", "dialog-open", "protocol-asset", "cli"] }
+serde = { version = "1.0.208", features = ["derive"] }
+serde_json = "1.0.127"
 glob = "0.3.1"
 fs_extra = "1.3.0"
 

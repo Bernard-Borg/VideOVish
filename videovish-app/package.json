@@ -30,7 +30,8 @@
     },
     "resolutions": {
         "braces": "3.0.3",
-        "micromatch": "4.0.8"
+        "micromatch": "4.0.8",
+        "postcss": "^8.4.31"
     },
     "packageManager": "yarn@1.22.22"
 }
