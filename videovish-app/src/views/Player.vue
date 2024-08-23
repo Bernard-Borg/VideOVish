@@ -30,7 +30,6 @@ import {
     Home,
     Save
 } from "lucide-vue-next";
-import type { Icon } from "lucide-vue-next";
 import { useNotification } from "../composables";
 import type { History } from "../types";
 
@@ -60,7 +59,7 @@ const videoSrc = ref<string>("");
 const videoTitle = ref<string>();
 const choosingVideo = ref<boolean>(false);
 
-const transformationIcon = ref<Icon>();
+const transformationIcon = ref();
 const transformationText = ref<string>();
 
 const circlePosition = computed(() => (currentTime.value / duration.value) * 100);
@@ -105,7 +104,7 @@ const { start, stop } = useTimeoutFn(() => {
 
 // A transformation alert shows up in the top right of the screen when the user
 // does certain interactions (like increasing volumew)
-const displayTransformationAlert = (icon: Icon, text?: string) => {
+const displayTransformationAlert = (icon: any, text?: string) => {
     transformationIcon.value = icon;
 
     if (text) {

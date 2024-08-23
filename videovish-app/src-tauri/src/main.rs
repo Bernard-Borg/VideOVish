@@ -154,7 +154,7 @@ async fn download_video(
             quality_code.to_string(),
             "--print".to_string(),
             "after_move:filepath".to_string(),
-            "--no-simulate".to_string(),
+            "--no-simulate".to_string()
         ])
         .spawn()
         .expect("Failed to spawn yt-dlp");
