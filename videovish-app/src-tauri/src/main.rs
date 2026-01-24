@@ -11,6 +11,7 @@ use std::{
     fs,
     path::{Path, PathBuf},
     process::{Command, Stdio},
+    time::Duration,
 };
 use tauri::AppHandle;
 use tauri::Emitter;
@@ -122,6 +123,28 @@ fn read_local_version(path: &Path) -> Option<String> {
                 None
             }
         })
+}
+
+fn find_latest_cached_video(downloads_folder: &Path, code: &str) -> Option<PathBuf> {
+    let glob_pattern = format!(
+        "{}{}*{}*",
+        downloads_folder.display(),
+        std::path::MAIN_SEPARATOR,
+        code
+    );
+    let mut best: Option<(std::time::SystemTime, PathBuf)> = None;
+
+    let entries = glob::glob(&glob_pattern).ok()?;
+    for entry in entries.flatten() {
+        let metadata = fs::metadata(&entry).ok()?;
+        let modified = metadata.modified().ok()?;
+        match &best {
+            Some((best_time, _)) if *best_time >= modified => {}
+            _ => best = Some((modified, entry)),
+        }
+    }
+
+    best.map(|(_, path)| path)
 }
 
 async fn fetch_latest_version(client: &Client) -> Result<String, String> {
@@ -324,8 +347,14 @@ async fn download_video(
 
     let output = match output {
         Ok(Ok(out)) => out,
-        Ok(Err(e)) => return format!("Failed to run yt-dlp: {e}"),
-        Err(e) => return format!("Failed to run yt-dlp: {e}"),
+        Ok(Err(e)) => {
+            error!("Failed to run yt-dlp: {e}");
+            return "Video failed to download".to_string();
+        }
+        Err(e) => {
+            error!("Failed to run yt-dlp: {e}");
+            return "Video failed to download".to_string();
+        }
     };
 
     let stdout = String::from_utf8_lossy(&output.stdout);
@@ -342,26 +371,20 @@ async fn download_video(
         if stderr.trim().is_empty() && !video_path.is_empty() {
             warn!("yt-dlp exited with error, but returned a file path: {}", video_path);
         } else {
-            return if stderr.trim().is_empty() {
-                "Failed to download video".to_string()
-            } else {
-                stderr.trim().to_string()
-            };
+            error!("yt-dlp failed: {}", stderr.trim());
+            return "Video failed to download".to_string();
         }
     }
 
     if video_path.is_empty() {
-        let glob_pattern = format!("{}{}*{}*", downloads_folder.display(), std::path::MAIN_SEPARATOR, code);
-        if let Ok(entries) = glob::glob(&glob_pattern) {
-            for entry in entries.flatten() {
-                video_path = entry.display().to_string();
-                break;
-            }
+        if let Some(path) = find_latest_cached_video(&downloads_folder, &code) {
+            video_path = path.display().to_string();
         }
     }
 
     if video_path.is_empty() {
-        return "Failed to download video".to_string();
+        error!("yt-dlp completed but no output file could be found in cache.");
+        return "Video failed to download".to_string();
     }
 
     let path_obj = Path::new(&video_path);
@@ -369,14 +392,38 @@ async fn download_video(
         video_path
     } else {
         let joined = downloads_folder.join(path_obj);
-        if !joined.exists() {
-            return "Failed to download video".to_string();
+        if joined.exists() {
+            joined.display().to_string()
+        } else {
+            // The filesystem may not have flushed yet or filename may differ (special chars).
+            let mut fallback: Option<PathBuf> = None;
+            for _ in 0..5 {
+                if let Some(path) = find_latest_cached_video(&downloads_folder, &code) {
+                    fallback = Some(path);
+                    break;
+                }
+                std::thread::sleep(Duration::from_millis(200));
+            }
+
+            if let Some(path) = fallback {
+                info!(
+                    "yt-dlp reported path mismatch; using cached file: {}",
+                    path.display()
+                );
+                path.display().to_string()
+            } else {
+                error!(
+                    "yt-dlp reported path but file does not exist: {}",
+                    joined.display()
+                );
+                return "Video failed to download".to_string();
+            }
         }
-        joined.display().to_string()
     };
 
     if resolved_path.is_empty() {
-        return "Failed to download video".to_string();
+        error!("yt-dlp resolved path was empty.");
+        return "Video failed to download".to_string();
     }
 
     let _ = handle
