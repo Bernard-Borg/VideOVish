@@ -7,7 +7,7 @@
     },
     "bundle": {
         "active": true,
-        "externalBin": ["binaries/yt-dlp", "binaries/ffmpeg"],
+        "externalBin": ["binaries/ffmpeg"],
         "targets": "all",
         "windows": {
             "webviewInstallMode": {

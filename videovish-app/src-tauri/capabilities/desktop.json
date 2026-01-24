@@ -44,8 +44,6 @@
         "core:window:allow-get-all-windows",
         "core:window:allow-destroy",
         "core:webview:allow-print",
-        "shell:allow-execute",
-        "shell:allow-open",
         "dialog:allow-open",
         "dialog:allow-save",
         "fs:default",
