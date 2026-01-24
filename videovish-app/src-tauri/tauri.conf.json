@@ -51,6 +51,7 @@
                 "height": 1080,
                 "minHeight": 480,
                 "minWidth": 480,
+                "maximized": true,
                 "decorations": false,
                 "titleBarStyle": "Overlay",
                 "useHttpsScheme": true
