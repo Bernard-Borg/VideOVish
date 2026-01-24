@@ -51,14 +51,14 @@ export default defineEventHandler(async (event) => {
 
         const response = await fetch(
             "https://www.googleapis.com/youtube/v3/search?" +
-                new URLSearchParams({
-                    part: "snippet",
-                    q: search,
-                    type: "video",
-                    maxResults: "5",
-                    regionCode: region,
-                    key: runtimeConfig.GOOGLE_API_KEY
-                })
+            new URLSearchParams({
+                part: "snippet",
+                q: search,
+                type: "video",
+                maxResults: "5",
+                regionCode: region,
+                key: runtimeConfig.GOOGLE_API_KEY
+            })
         ).then((result) => result.json());
 
         if ("error" in response) {

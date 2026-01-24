@@ -14,7 +14,9 @@ use tauri_plugin_shell::ShellExt;
 
 #[tauri::command]
 async fn show_help_window(handle: tauri::AppHandle) {
-    if !handle.get_webview_window("help").is_none() {
+    if let Some(window) = handle.get_webview_window("help") {
+        let _ = window.show();
+        let _ = window.set_focus();
         return;
     }
 
@@ -28,14 +30,16 @@ async fn show_help_window(handle: tauri::AppHandle) {
     .skip_taskbar(true)
     .decorations(false)
     .transparent(true)
-    .always_on_top(true)
+    .always_on_top(false)
     .build()
     .unwrap();
 }
 
 #[tauri::command]
 async fn show_youtube_modal(handle: tauri::AppHandle) {
-    if !handle.get_webview_window("youtube").is_none() {
+    if let Some(window) = handle.get_webview_window("youtube") {
+        let _ = window.show();
+        let _ = window.set_focus();
         return;
     }
 
@@ -44,13 +48,13 @@ async fn show_youtube_modal(handle: tauri::AppHandle) {
         "youtube", /* the unique window label */
         tauri::WebviewUrl::App("youtube".into())
     )
-    .inner_size(780.0, 250.0)
+    .inner_size(780.0, 400.0)
     .min_inner_size(480.0, 200.0)
     .resizable(true)
     .skip_taskbar(true)
     .decorations(false)
     .transparent(true)
-    .always_on_top(true)
+    .always_on_top(false)
     .build()
     .unwrap();
 }

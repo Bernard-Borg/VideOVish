@@ -566,10 +566,10 @@ onUnmounted(() => {
             </div>
         </button>
         <div class="w-full flex justify-center items-center text-white">
-            <div class="flex flex-grow justify-center cursor-grab" data-tauri-drag-region>
+            <div class="flex grow justify-center cursor-grab" data-tauri-drag-region>
                 <span
                     v-if="videoTitle"
-                    class="select-none cursor-pointer p-1 px-2 outline outline-1 rounded-md m-1 text-sm bg-black hover:bg-charcoal"
+                    class="select-none cursor-pointer p-1 px-2 outline rounded-md m-1 text-sm bg-black hover:bg-charcoal"
                     title="Change Video"
                     @click="showVideoChooser"
                 >
@@ -578,7 +578,7 @@ onUnmounted(() => {
             </div>
             <div class="w-[100px]"></div>
         </div>
-        <div class="fixed top-0 right-0 flex items-center h-[36px] justify-around flex-grow-0 w-[100px]">
+        <div class="fixed top-0 right-0 flex items-center h-[36px] justify-around grow-0 w-[100px]">
             <Minus
                 class="cursor-pointer text-white hover:text-slate-300"
                 @click="() => getCurrentWebviewWindow().minimize()"
@@ -609,7 +609,7 @@ onUnmounted(() => {
     <Transition name="fade">
         <div
             v-if="transformationIcon"
-            class="rounded-full bg-black outline outline-1 outline-white bg-opacity-50 flex flex-col justify-evenly items-center absolute m-4 right-0 aspect-square w-[100px]"
+            class="rounded-full bg-black outline outline-white bg-opacity-50 flex flex-col justify-evenly items-center absolute m-4 right-0 aspect-square w-[100px]"
         >
             <div class="w-5"><component :is="transformationIcon" color="white" /></div>
             <span v-if="transformationText" class="text-white">{{ transformationText }}</span>
@@ -639,7 +639,7 @@ onUnmounted(() => {
                 <div class="w-0 bg-red-600 h-[5px]" :style="{ width: `${(currentTime / duration) * 100}%` }"></div>
                 <div
                     ref="progressCircle"
-                    class="rounded-full aspect-square w-4 bg-red-600 outline outline-1 outline-white absolute top-0 cursor-grab z-50"
+                    class="rounded-full aspect-square w-4 bg-red-600 outline outline-white absolute top-0 cursor-grab z-50"
                     :style="{
                         left: `${circlePosition}%`
                     }"
@@ -654,7 +654,7 @@ onUnmounted(() => {
     </div>
     <!-- Video controls -->
     <div
-        :class="`w-full h-[80px] flex fixed bottom-0 left-0 items-center justify-between pl-8 pr-8 bg-gradient-to-b from-transparent to-black ${
+        :class="`w-full h-[80px] flex fixed bottom-0 left-0 items-center justify-between pl-8 pr-8 bg-linear-to-b from-transparent to-black ${
             uiHidden ? 'hidden' : ''
         }`"
     >

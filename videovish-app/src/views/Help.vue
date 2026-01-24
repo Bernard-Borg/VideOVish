@@ -19,12 +19,12 @@ const { closeWindow } = useWindowClose("help", true);
         </div>
         <div class="flex gap-16 px-12 py-8 justify-evenly">
             <div class="w-full">
-                <h2 class="text-2xl !font-semibold">Video Playback</h2>
+                <h2 class="text-2xl font-semibold!">Video Playback</h2>
                 <span class="text-sm inline-block mb-7">These shortcuts have to do with playing the video.</span>
                 <HelpEntry v-bind="entry" v-for="entry in helpEntries.filter((x) => x.category === 'playback')" />
             </div>
             <div class="w-full">
-                <h2 class="text-2xl !font-semibold">App Management</h2>
+                <h2 class="text-2xl font-semibold!">App Management</h2>
                 <span class="text-sm inline-block mb-7">These shortcuts have to do with managing the app itself.</span>
                 <HelpEntry v-bind="entry" v-for="entry in helpEntries.filter((x) => x.category === 'management')" />
             </div>

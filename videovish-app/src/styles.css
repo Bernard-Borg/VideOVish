@@ -1,6 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+    --font-sans: "Inter", "Segoe UI", "sans-serif";
+    --color-charcoal: #252526;
+}
 
 html,
 body,

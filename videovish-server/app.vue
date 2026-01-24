@@ -35,9 +35,7 @@ useHead({
 </template>
 
 <style>
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 html,
 body {
