@@ -8,6 +8,16 @@
     "bundle": {
         "active": true,
         "externalBin": ["binaries/ffmpeg"],
+        "fileAssociations": [
+            {
+                "name": "VideoVish Video",
+                "ext": ["mp4", "webm", "mkv", "mov"]
+            },
+            {
+                "name": "VideoVish Audio",
+                "ext": ["mp3", "ogg"]
+            }
+        ],
         "targets": "all",
         "windows": {
             "webviewInstallMode": {
@@ -18,7 +28,7 @@
     },
     "productName": "VideoVish",
     "mainBinaryName": "VideoVish",
-    "version": "2.1.5",
+    "version": "2.2.0",
     "identifier": "borg.videovish",
     "plugins": {
         "cli": {

@@ -13,6 +13,9 @@ use std::{
     process::{Command, Stdio},
     time::Duration,
 };
+
+#[cfg(windows)]
+use std::os::windows::process::CommandExt;
 use tauri::AppHandle;
 use tauri::Emitter;
 use tauri::Manager;
@@ -337,11 +340,16 @@ async fn download_video(
     ];
 
     let output = tauri::async_runtime::spawn_blocking(move || {
-        Command::new(&yt_dlp_path)
-            .args(command_args)
+        let mut cmd = Command::new(&yt_dlp_path);
+        cmd.args(command_args)
             .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .output()
+            .stderr(Stdio::piped());
+        #[cfg(windows)]
+        {
+            const CREATE_NO_WINDOW: u32 = 0x08000000;
+            cmd.creation_flags(CREATE_NO_WINDOW);
+        }
+        cmd.output()
     })
     .await;
 
