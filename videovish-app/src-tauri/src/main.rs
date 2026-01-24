@@ -305,7 +305,7 @@ async fn download_video(
         "-P".to_string(),
         downloads_folder.display().to_string(),
         "--extractor-args".to_string(),
-        "youtube:skip=hls,dash;youtube:skip=translated_subs".to_string(),
+        "youtube:skip=hls,dash;youtube:skip=translated_subs;youtube:player_client=browser".to_string(),
         "-f".to_string(),
         quality_code.to_string(),
         "--print".to_string(),
