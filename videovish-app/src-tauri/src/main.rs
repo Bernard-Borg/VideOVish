@@ -78,6 +78,13 @@ struct GithubRelease {
 
 const YT_DLP_USER_AGENT: &str = "VideOVish";
 
+fn videovish_base_dir() -> Result<PathBuf, String> {
+    let cache_dir = dirs::cache_dir().ok_or("Unable to locate cache directory")?;
+    let base_dir = cache_dir.join("videovish");
+    fs::create_dir_all(&base_dir).map_err(|e| e.to_string())?;
+    Ok(base_dir)
+}
+
 fn yt_dlp_asset_name() -> &'static str {
     if cfg!(target_os = "windows") {
         "yt-dlp.exe"
@@ -89,8 +96,7 @@ fn yt_dlp_asset_name() -> &'static str {
 }
 
 fn yt_dlp_cache_path() -> Result<PathBuf, String> {
-    let cache_dir = dirs::cache_dir().ok_or("Unable to locate cache directory")?;
-    let tools_dir = cache_dir.join("videovish").join("tools");
+    let tools_dir = videovish_base_dir()?.join("tools");
     fs::create_dir_all(&tools_dir).map_err(|e| e.to_string())?;
 
     let filename = if cfg!(target_os = "windows") {
@@ -204,9 +210,11 @@ async fn ensure_yt_dlp() -> Result<PathBuf, String> {
 
 #[tauri::command]
 async fn clear_cache(_handle: tauri::AppHandle) -> String {
-    // Get path to youtube_downloads foldre
-    let app_data_dir = dirs::cache_dir().unwrap();
-    let downloads_folder = Path::new(&app_data_dir).join("youtube_downloads");
+    // Get path to cache directory
+    let downloads_folder = match videovish_base_dir() {
+        Ok(base_dir) => base_dir.join("cache"),
+        Err(err) => return err,
+    };
 
     // Create folder if it doesn't exist
     if !downloads_folder.is_dir() {
@@ -235,9 +243,11 @@ async fn download_video(
     code: String,
     quality: String,
 ) -> String {
-    // Get path to youtube_downloads foldre
-    let app_data_dir = dirs::cache_dir().unwrap();
-    let downloads_folder = Path::new(&app_data_dir).join("youtube_downloads");
+    // Get path to cache directory
+    let downloads_folder = match videovish_base_dir() {
+        Ok(base_dir) => base_dir.join("cache"),
+        Err(err) => return err,
+    };
 
     // Create folder if it doesn't exist
     if !downloads_folder.is_dir() {
@@ -245,7 +255,7 @@ async fn download_video(
     }
 
     let mut vid_path: String = String::from("");
-    let glob_pattern = format!("{}/youtube_downloads/*{}*", app_data_dir.display(), code);
+    let glob_pattern = format!("{}{}*{}*", downloads_folder.display(), std::path::MAIN_SEPARATOR, code);
 
     for entry in glob::glob(&glob_pattern).expect("Failed to read glob pattern") {
         match entry {
@@ -303,8 +313,6 @@ async fn download_video(
         "--no-simulate".to_string(),
     ];
 
-    let mut video_path: String = String::new();
-
     let output = tauri::async_runtime::spawn_blocking(move || {
         Command::new(&yt_dlp_path)
             .args(command_args)
@@ -320,16 +328,37 @@ async fn download_video(
         Err(e) => return format!("Failed to run yt-dlp: {e}"),
     };
 
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let mut video_path = stdout
+        .lines()
+        .map(|line| line.trim())
+        .filter(|line| !line.is_empty())
+        .last()
+        .unwrap_or_default()
+        .to_string();
+
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        return if stderr.trim().is_empty() {
-            "Failed to download video".to_string()
+        if stderr.trim().is_empty() && !video_path.is_empty() {
+            warn!("yt-dlp exited with error, but returned a file path: {}", video_path);
         } else {
-            stderr.trim().to_string()
-        };
+            return if stderr.trim().is_empty() {
+                "Failed to download video".to_string()
+            } else {
+                stderr.trim().to_string()
+            };
+        }
     }
 
-    video_path = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    if video_path.is_empty() {
+        let glob_pattern = format!("{}{}*{}*", downloads_folder.display(), std::path::MAIN_SEPARATOR, code);
+        if let Ok(entries) = glob::glob(&glob_pattern) {
+            for entry in entries.flatten() {
+                video_path = entry.display().to_string();
+                break;
+            }
+        }
+    }
 
     if video_path.is_empty() {
         return "Failed to download video".to_string();
@@ -367,9 +396,11 @@ async fn download_video(
 
 #[tauri::command]
 async fn save_youtube_video(_handle: AppHandle, code: String, path_to_save: String) -> String {
-    // Get path to youtube_downloads folder
-    let app_data_dir = dirs::cache_dir().unwrap();
-    let downloads_folder = Path::new(&app_data_dir).join("youtube_downloads");
+    // Get path to cache directory
+    let downloads_folder = match videovish_base_dir() {
+        Ok(base_dir) => base_dir.join("cache"),
+        Err(err) => return err,
+    };
 
     // Create folder if it doesn't exist
     if !downloads_folder.is_dir() {
@@ -377,7 +408,7 @@ async fn save_youtube_video(_handle: AppHandle, code: String, path_to_save: Stri
     }
 
     let mut vid_path: String = String::from("");
-    let glob_pattern = format!("{}/youtube_downloads/*{}*", app_data_dir.display(), code);
+    let glob_pattern = format!("{}{}*{}*", downloads_folder.display(), std::path::MAIN_SEPARATOR, code);
 
     for entry in glob::glob(&glob_pattern).expect("Failed to read glob pattern") {
         match entry {
@@ -403,10 +434,16 @@ async fn save_youtube_video(_handle: AppHandle, code: String, path_to_save: Stri
 }
 
 fn main() {
+    let log_dir = videovish_base_dir()
+        .unwrap_or_else(|_| std::env::temp_dir())
+        .join("logs");
+    let _ = fs::create_dir_all(&log_dir);
+
     tauri::Builder::default()
         .plugin(
             tauri_plugin_log::Builder::new()
-                .target(Target::new(TargetKind::LogDir {
+                .target(Target::new(TargetKind::Folder {
+                    path: log_dir,
                     file_name: None,
                 }))
                 .build(),
