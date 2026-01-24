@@ -6,7 +6,7 @@ defineEmits(["local", "youtube", "previous", "quit"]);
 </script>
 
 <template>
-    <div class="flex flex-col w-full h-full justify-center items-center bg-transparent" data-tauri-drag-region>
+    <div class="flex flex-col w-full h-full justify-center items-center bg-transparent">
         <div class="p-1 text-white z-10 px-3 font-light">Choose video source</div>
         <div class="bg-charcoal p-[50px] flex gap-10 rounded-md outline-white outline">
             <button

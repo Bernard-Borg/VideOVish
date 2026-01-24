@@ -23,7 +23,7 @@ useHead({
         An open-source minimalistic desktop video player and YouTube downloader for Windows 7+ and Linux (soon, maybe)
     </span>
     <div
-        class="flex fixed p-3 bottom-[10px] right-[10px] gap-2 outline outline-1 outline-black rounded-md bg-slate-100"
+        class="flex fixed p-3 bottom-[10px] right-[10px] gap-2 outline outline-black rounded-md bg-slate-100"
     >
         <Logo link="https://github.com/tauri-apps" logoSrc="/tauri-logo.png" description="Tauri logo" />
         <Logo link="https://vuejs.org/" logoSrc="/vue-logo.png" description="Vue logo" />
