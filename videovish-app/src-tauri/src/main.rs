@@ -113,11 +113,18 @@ fn yt_dlp_cache_path() -> Result<PathBuf, String> {
 }
 
 fn read_local_version(path: &Path) -> Option<String> {
-    Command::new(path)
-        .arg("--version")
+    let mut cmd = Command::new("cmd");
+    let command_line = format!("{} --version", path.display());
+    cmd.args(["/C", &command_line])
         .stdout(Stdio::piped())
-        .stderr(Stdio::null())
-        .output()
+        .stderr(Stdio::null());
+    #[cfg(windows)]
+    {
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        cmd.creation_flags(CREATE_NO_WINDOW);
+        info!("Checking version");
+    }
+    cmd.output()
         .ok()
         .and_then(|out| {
             if out.status.success() {
@@ -191,13 +198,6 @@ async fn download_yt_dlp(client: &Client, dest: &Path) -> Result<(), String> {
     }
 
     fs::rename(&tmp_path, dest).map_err(|e| e.to_string())?;
-
-    #[cfg(unix)]
-    {
-        let mut perms = fs::metadata(dest).map_err(|e| e.to_string())?.permissions();
-        perms.set_mode(0o755);
-        fs::set_permissions(dest, perms).map_err(|e| e.to_string())?;
-    }
 
     info!("yt-dlp updated: {}", dest.display());
     Ok(())
@@ -340,8 +340,14 @@ async fn download_video(
     ];
 
     let output = tauri::async_runtime::spawn_blocking(move || {
-        let mut cmd = Command::new(&yt_dlp_path);
-        cmd.args(command_args)
+        let mut cmd = Command::new("cmd");
+        let quoted_args = command_args
+            .iter()
+            .map(|arg| format!("{}", arg.replace('"', "\\\"")))
+            .collect::<Vec<_>>()
+            .join(" ");
+        let command_line = format!("{} {}", yt_dlp_path.display(), quoted_args);
+        cmd.args(["/C", &command_line])
             .stdout(Stdio::piped())
             .stderr(Stdio::piped());
         #[cfg(windows)]
