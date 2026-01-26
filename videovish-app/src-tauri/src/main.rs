@@ -19,6 +19,7 @@ use std::os::windows::process::CommandExt;
 use tauri::AppHandle;
 use tauri::Emitter;
 use tauri::Manager;
+use tauri::path::BaseDirectory;
 use tauri_plugin_log::{Target, TargetKind};
 use log::{error, info, warn};
 
@@ -110,6 +111,18 @@ fn yt_dlp_cache_path() -> Result<PathBuf, String> {
     };
 
     Ok(tools_dir.join(filename))
+}
+
+fn ffmpeg_path(handle: &AppHandle) -> Result<PathBuf, String> {
+    let filename = if cfg!(target_os = "windows") {
+        "ffmpeg.exe"
+    } else {
+        "ffmpeg"
+    };
+    handle
+        .path()
+        .resolve(filename, BaseDirectory::Resource)
+        .map_err(|e| e.to_string())
 }
 
 fn read_local_version(path: &Path) -> Option<String> {
@@ -326,6 +339,10 @@ async fn download_video(
         Ok(path) => path,
         Err(err) => return err,
     };
+    let ffmpeg_location = match ffmpeg_path(&handle) {
+        Ok(path) => path,
+        Err(err) => return err,
+    };
     let command_args = vec![
         url,
         "-P".to_string(),
@@ -337,6 +354,8 @@ async fn download_video(
         "--print".to_string(),
         "after_move:filepath".to_string(),
         "--no-simulate".to_string(),
+        "--ffmpeg-location".to_string(),
+        ffmpeg_location.display().to_string(),
     ];
 
     let output = tauri::async_runtime::spawn_blocking(move || {
@@ -347,6 +366,8 @@ async fn download_video(
             .collect::<Vec<_>>()
             .join(" ");
         let command_line = format!("{} {}", yt_dlp_path.display(), quoted_args);
+        info!("Downloading video with command: {}", command_line);
+        info!("ffmpeg location: {}", ffmpeg_location.display());
         cmd.args(["/C", &command_line])
             .stdout(Stdio::piped())
             .stderr(Stdio::piped());

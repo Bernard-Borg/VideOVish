@@ -31,6 +31,8 @@ import {
 } from "lucide-vue-next";
 import { useNotification } from "../composables";
 import type { History } from "../types";
+import { debug } from "@tauri-apps/plugin-log";
+
 const appWindow = getCurrentWebviewWindow();
 
 const NUM_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
@@ -464,6 +466,7 @@ onBeforeMount(async () => {
 
     await getMatches().then((matches) => {
         videoPath = matches.args["videoPath"].value as string;
+        debug(`Args: ${matches.args}: ${videoPath}`);
     });
 
     if (videoPath && (await exists(videoPath))) {
