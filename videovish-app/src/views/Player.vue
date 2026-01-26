@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import NotificationRenderer from "../NotificationRenderer.vue";
 import VideoChooser from "./VideoChooser.vue";
-import { onBeforeMount, onMounted, onUnmounted, ref, computed, watch, shallowRef } from "vue";
+import { onBeforeMount, onMounted, onUnmounted, ref, computed, watch, shallowRef, warn } from "vue";
 import { invoke, convertFileSrc } from "@tauri-apps/api/core";
 import { getMatches } from "@tauri-apps/plugin-cli";
 import { open, save } from "@tauri-apps/plugin-dialog";
@@ -253,7 +253,7 @@ const setVideoSource = async (filepath: string, title?: string | null) => {
     let fileExtension = await extname(filepath);
 
     if (!VALID_EXTENSIONS.includes(fileExtension.toLowerCase())) {
-        console.warn("WARNING: file type might not work properly");
+        warn("WARNING: file type might not work properly", { file: "Player.vue" });
     }
 
     playVideo();

@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
 
         if (!isValidISOCode) {
             region = "US";
-            console.log("Invalid region code received");
+            console.error("Invalid region code received");
         }
 
         const response = await fetch(

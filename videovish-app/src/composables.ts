@@ -12,7 +12,6 @@ const store = useLocalStorage<{
 
 const useNotification = () => {
     const add = (options: Notification) => {
-        console.log(options);
         const uniqueId = uuid();
 
         store.value.notifications.push({
@@ -36,8 +35,6 @@ const useNotification = () => {
 
 const useWindowClose = (label: string, disableBlur: boolean | Ref<boolean> = false) => {
     const closeWindow = async () => {
-        console.log(label);
-
         const window = await WebviewWindow.getByLabel(label);
         window?.close();
     };

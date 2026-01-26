@@ -1,6 +1,7 @@
 import { createApp } from "vue";
 import "./styles.css";
 import App from "./App.vue";
+import { error } from "@tauri-apps/plugin-log";
 
 import translations from "./translations";
 import i18next from "i18next";
@@ -16,7 +17,7 @@ const { add } = useNotification();
 const app = createApp(App);
 
 app.config.errorHandler = (err: unknown) => {
-    console.log(err);
+    error(err as string);
     add({
         text: (err as Error).message,
         type: "error",

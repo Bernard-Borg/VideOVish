@@ -10,6 +10,7 @@ import type { History } from "../types";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import countries from "i18n-iso-countries";
 import en from "i18n-iso-countries/langs/en.json";
+import { error } from "@tauri-apps/plugin-log";
 
 countries.registerLocale(en);
 
@@ -210,7 +211,7 @@ const clearCache = async () => {
             const numberResult = parseInt(result as string);
 
             if (isNaN(numberResult)) {
-                console.error("Clear cache return is not a number");
+                error("Clear cache return is not a number", { file: "YouTube.vue" });
                 return;
             }
 
