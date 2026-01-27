@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, onUnmounted, watch, useTemplateRef } from "vue";
 import { invoke } from "@tauri-apps/api/core";
+import { emit } from "@tauri-apps/api/event";
 import { onClickOutside, onStartTyping, useIntervalFn, useLocalStorage, useOnline } from "@vueuse/core";
 import { X, Search, ExternalLink } from "lucide-vue-next";
 import { Trash2 } from "lucide-vue-next";
-import { useNotification, useWindowClose } from "../composables";
+import { useWindowClose } from "../composables";
 import type { Schema$SearchListResponse, Schema$SearchResult } from "youtube-api";
 import type { History } from "../types";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
@@ -70,8 +71,6 @@ const history = useLocalStorage<History>("history", {
 });
 
 const online = useOnline();
-const { add } = useNotification();
-
 const { closeWindow } = useWindowClose("youtube", true);
 
 // Loading... animation
@@ -202,11 +201,7 @@ const formatBytes = (bytes: number, decimals: number = 2) => {
 const clearCache = async () => {
     await invoke("clear_cache").then((result) => {
         if (result === "EMPTY") {
-            add({
-                text: "Cache already empty",
-                type: "info",
-                timeout: 3000
-            });
+            emit("app-notify", { text: "Cache already empty", type: "info", timeout: 3000 });
         } else if (result) {
             const numberResult = parseInt(result as string);
 
@@ -217,11 +212,7 @@ const clearCache = async () => {
 
             result = formatBytes(numberResult);
 
-            add({
-                text: `Cleared ${result} from cache`,
-                type: "success",
-                timeout: 3000
-            });
+            emit("app-notify", { text: `Cleared ${result} from cache`, type: "success", timeout: 3000 });
 
             if (history.value.isYoutube) {
                 history.value.video = undefined;

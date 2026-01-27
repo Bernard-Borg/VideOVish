@@ -546,23 +546,23 @@ onUnmounted(() => {
         @quit="getCurrentWebviewWindow().close()"
     />
     <!-- Top bar -->
-    <div class="bg-charcoal min-h-[30px] flex gap-1"  data-tauri-drag-region>
-        <button @click="showHelpWindow" class="aspect-square w-[30px] p-1">
+    <div class="bg-charcoal min-h-[30px] flex gap-1 w-full fixed top-0 left-0" data-tauri-drag-region>
+        <button v-if="!choosingVideo" @click="showHelpWindow" class="aspect-square w-[30px] p-1">
             <div class="flex items-center justify-center">
                 <Info color="white" fill="#1958b7" :strokeWidth="1.5" />
             </div>
         </button>
-        <button ref="youtubeButton" @click="showYoutubeModal" class="aspect-square w-[30px] p-1">
+        <button v-if="!choosingVideo" ref="youtubeButton" @click="showYoutubeModal" class="aspect-square w-[30px] p-1">
             <div class="flex items-center justify-center">
                 <Youtube fill="red" color="white" :strokeWidth="1.5" />
             </div>
         </button>
-        <button ref="homeButton" @click="showVideoChooser" class="aspect-square w-[30px] p-1">
+        <button v-if="!choosingVideo" ref="homeButton" @click="showVideoChooser" class="aspect-square w-[30px] p-1">
             <div class="flex items-center justify-center">
                 <Home class="inline-block" color="white" :strokeWidth="1.5" />
             </div>
         </button>
-        <button v-if="history.isYoutube" ref="saveButton" @click="saveYouTubeVideo" class="aspect-square w-[30px] p-1">
+        <button v-if="!choosingVideo && history.isYoutube" ref="saveButton" @click="saveYouTubeVideo" class="aspect-square w-[30px] p-1">
             <div class="flex items-center justify-center">
                 <Save color="white" />
             </div>
@@ -580,7 +580,7 @@ onUnmounted(() => {
             </div>
             <div class="w-[100px]"></div>
         </div>
-        <div class="fixed top-0 right-0 flex items-center h-[36px] justify-around grow-0 w-[100px]">
+        <div class="flex items-center h-[36px] justify-around grow-0 w-[100px]">
             <Minus
                 class="cursor-pointer text-white hover:text-slate-300"
                 @click="() => getCurrentWebviewWindow().minimize()"
