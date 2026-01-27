@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import YoutubeIcon from "../components/YoutubeIcon.vue";
 import NotificationRenderer from "../NotificationRenderer.vue";
 import VideoChooser from "./VideoChooser.vue";
 import { onBeforeMount, onMounted, onUnmounted, ref, computed, watch, shallowRef, warn } from "vue";
@@ -18,9 +19,7 @@ import {
     Rewind,
     FastForward,
     Maximize,
-    Minimize,
-    Youtube,
-    VolumeX,
+    Minimize, VolumeX,
     Volume1,
     Volume2,
     Minus,
@@ -525,6 +524,8 @@ onMounted(() => {
     if (typeof history.value.volume === "number") {
         volume.value = history.value.volume;
     }
+
+    document.addEventListener('click', (e) => console.log(e.target));
 });
 
 onUnmounted(() => {
@@ -546,15 +547,15 @@ onUnmounted(() => {
         @quit="getCurrentWebviewWindow().close()"
     />
     <!-- Top bar -->
-    <div class="bg-charcoal min-h-[30px] flex gap-1 w-full fixed top-0 left-0" data-tauri-drag-region>
+    <div class="bg-charcoal min-h-[30px] flex gap-1 w-full fixed top-0 left-0 z-100" data-tauri-drag-region>
         <button v-if="!choosingVideo" @click="showHelpWindow" class="aspect-square w-[30px] p-1">
             <div class="flex items-center justify-center">
-                <Info color="white" fill="#1958b7" :strokeWidth="1.5" />
-            </div>
+                <Info color="white" :strokeWidth="1.5" />
+            </div>  
         </button>
         <button v-if="!choosingVideo" ref="youtubeButton" @click="showYoutubeModal" class="aspect-square w-[30px] p-1">
             <div class="flex items-center justify-center">
-                <Youtube fill="red" color="white" :strokeWidth="1.5" />
+                <YoutubeIcon color="white" :height="25" />
             </div>
         </button>
         <button v-if="!choosingVideo" ref="homeButton" @click="showVideoChooser" class="aspect-square w-[30px] p-1">
@@ -567,8 +568,8 @@ onUnmounted(() => {
                 <Save color="white" />
             </div>
         </button>
-        <div class="w-full flex justify-center items-center text-white">
-            <div class="flex grow justify-center cursor-grab">
+        <div v-if="!choosingVideo" class="w-full flex justify-center items-center text-white">
+            <div class="flex grow justify-center cursor-grab" data-tauri-drag-region>
                 <span
                     v-if="videoTitle"
                     class="select-none cursor-pointer p-1 px-2 outline rounded-md m-1 text-sm bg-black hover:bg-charcoal"
@@ -578,9 +579,8 @@ onUnmounted(() => {
                     {{ videoTitle }}
                 </span>
             </div>
-            <div class="w-[100px]"></div>
         </div>
-        <div class="flex items-center h-[36px] justify-around grow-0 w-[100px]">
+        <div :class="`flex items-center h-[36px] justify-around grow-0 w-[100px] ${choosingVideo ? 'absolute right-0' : ''}`">
             <Minus
                 class="cursor-pointer text-white hover:text-slate-300"
                 @click="() => getCurrentWebviewWindow().minimize()"
